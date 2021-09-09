@@ -42,6 +42,10 @@ app.get('/check-in/:school/:bus', (req, res) => {
   }
 });
 
+app.get('/privacy', (req, res) => {
+  res.render('privacy');
+});
+
 app.listen(port, () => {
   console.log(`Leopard is running at http://localhost:${port}`);
 })
