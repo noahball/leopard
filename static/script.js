@@ -1,5 +1,7 @@
-Swal.fire({
-    icon: 'success',
-    title: 'Thanks, Noah',
-    text: 'You\'ve checked in successfully!',
-  })
+function success() {
+    Swal.fire({
+        icon: 'success',
+        title: 'Thanks, Noah',
+        text: 'You\'ve checked in successfully!',
+      })
+}
