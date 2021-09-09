@@ -33,8 +33,14 @@ app.get('/', (req, res) => {
 });
 
 app.get('/check-in/:school/:bus', (req, res) => {
-  res.send('Page to check-in a student who is on the ' + req.params.bus + ' bus at ' + req.params.school);
-})
+  if(req.params.school == 'aquinas') {
+    res.render('checkin', {
+      BusNumber: req.params.bus
+    });
+  } else {
+    res.send(req.params.school + ' does not currently use Panther.');
+  }
+});
 
 app.listen(port, () => {
   console.log(`Leopard is running at http://localhost:${port}`);
