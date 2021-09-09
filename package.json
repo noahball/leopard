@@ -1,0 +1,22 @@
+{
+  "name": "leopard",
+  "version": "1.0.0",
+  "description": "Contact tracing for school buses.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noahball/leopard.git"
+  },
+  "author": "Noah Ball",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noahball/leopard/issues"
+  },
+  "homepage": "https://github.com/noahball/leopard#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
