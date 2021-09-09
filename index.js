@@ -38,7 +38,7 @@ app.get('/check-in/:school/:bus', (req, res) => {
       BusNumber: req.params.bus
     });
   } else {
-    res.send(req.params.school + ' does not currently use Panther.');
+    res.send(req.params.school + ' does not currently use Leopard.');
   }
 });
 
