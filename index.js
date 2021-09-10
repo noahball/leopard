@@ -38,10 +38,15 @@ app.get('/check-in/:school/:bus', (req, res) => {
     var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     var dayName = days[new Date().getDay()];
 
+    var hours = new Date().getHours();
+    var hours = hours + 14;
+    var ampm = (hours >= 12) ? "PM" : "AM";
+
     res.render('checkin', {
       busNumber: req.params.bus,
       currentDay: dayName,
-      date: getDate()
+      date: getDate(),
+      ampm: ampm
     });
   } else {
     res.send(req.params.school + ' does not currently use Leopard.');
