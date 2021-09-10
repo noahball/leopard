@@ -11,12 +11,12 @@ const port = 3000 // Port for Leopard's web server to run on
 // Middleware
 app.use(express.json());
 app.use(bodyParser.urlencoded({
-    extended: false
+  extended: false
 }));
 app.use(cookieParser());
 
 const {
-    render
+  render
 } = require('ejs');
 
 // Use ejs to render pages
@@ -33,9 +33,15 @@ app.get('/', (req, res) => {
 });
 
 app.get('/check-in/:school/:bus', (req, res) => {
-  if(req.params.school == 'aquinas') {
+  if (req.params.school == 'aquinas') {
+
+    var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var dayName = days[new Date().getDay()];
+
     res.render('checkin', {
-      BusNumber: req.params.bus
+      busNumber: req.params.bus,
+      currentDay: dayName,
+      date: getDate()
     });
   } else {
     res.send(req.params.school + ' does not currently use Leopard.');
@@ -49,3 +55,14 @@ app.get('/privacy', (req, res) => {
 app.listen(port, () => {
   console.log(`Leopard is running at http://localhost:${port}`);
 })
+
+// Functions
+function getDate() {
+  const dateObj = new Date();
+  const month = dateObj.getMonth() + 1;
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  const year = dateObj.getFullYear();
+  const output = day + '/' + month + '/' + year;
+
+  return output;
+}
