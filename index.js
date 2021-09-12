@@ -8,6 +8,20 @@ const cookieParser = require("cookie-parser");
 const app = express() // Define Express
 const port = 3000 // Port for Leopard's web server to run on
 
+// Firebase
+const admin = require('firebase-admin');
+const serviceAccount = require("./firebase.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://leopard-data-default-rtdb.asia-southeast1.firebasedatabase.app"
+});
+var db = admin.database();
+var ref = db.ref("activation");
+var connection = db.ref("/");
+var keysRef = ref.child("keys");
+
+connectionStatus();
+
 // Middleware
 app.use(express.json());
 app.use(bodyParser.urlencoded({
@@ -68,10 +82,10 @@ app.post('/api/v1/check-in', (req, res) => {
   //if (error) return res.status(400).send('Something went wrong.<br>Error: ' + error.details[0].message + '<br>Press the back button in your browser to try again.');
 
   //if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class) {
-    //res.send('incomplete')
+  //res.send('incomplete')
   //} else {
-    console.log('Bus: ' + req.body.bus + '\nDate: ' + req.body.date + '\nJourney: ' + req.body.journey + '\nName: ' + req.body.name + '\nTutor Class: ' + req.body.class)
-    res.send('success');
+  console.log('Bus: ' + req.body.bus + '\nDate: ' + req.body.date + '\nJourney: ' + req.body.journey + '\nName: ' + req.body.name + '\nTutor Class: ' + req.body.class)
+  res.send('success');
   //}
 });
 
@@ -84,4 +98,15 @@ function getDate() {
   const output = day + '-' + month + '-' + year;
 
   return output;
+}
+
+function connectionStatus() {
+  const db = admin.database();
+  const ref = db.ref('/');
+
+  ref.on('value', (snapshot) => {
+    console.log(snapshot.val());
+  }, (errorObject) => {
+    console.log('The read failed: ' + errorObject.name);
+  });
 }
