@@ -61,6 +61,20 @@ app.listen(port, () => {
   console.log(`Leopard is running at http://localhost:${port}`);
 })
 
+app.post('/api/v1/check-in', (req, res) => {
+  //const {
+  //error
+  //} = validate(req.body);
+  //if (error) return res.status(400).send('Something went wrong.<br>Error: ' + error.details[0].message + '<br>Press the back button in your browser to try again.');
+
+  if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class) {
+    res.send('incomplete')
+  } else {
+    console.log('Bus: ' + req.body.bus + '\nDate: ' + req.body.date + '\nJourney: ' + req.body.journey + '\nName: ' + req.body.name + '\nTutor Class: ' + req.body.class)
+    res.send('success');
+  }
+});
+
 // Functions
 function getDate() {
   const dateObj = new Date();
