@@ -67,12 +67,12 @@ app.post('/api/v1/check-in', (req, res) => {
   //} = validate(req.body);
   //if (error) return res.status(400).send('Something went wrong.<br>Error: ' + error.details[0].message + '<br>Press the back button in your browser to try again.');
 
-  if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class) {
-    res.send('incomplete')
-  } else {
+  //if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class) {
+    //res.send('incomplete')
+  //} else {
     console.log('Bus: ' + req.body.bus + '\nDate: ' + req.body.date + '\nJourney: ' + req.body.journey + '\nName: ' + req.body.name + '\nTutor Class: ' + req.body.class)
     res.send('success');
-  }
+  //}
 });
 
 // Functions
@@ -81,7 +81,7 @@ function getDate() {
   const month = dateObj.getMonth() + 1;
   const day = String(dateObj.getDate()).padStart(2, '0');
   const year = dateObj.getFullYear();
-  const output = day + '/' + month + '/' + year;
+  const output = day + '-' + month + '-' + year;
 
   return output;
 }
