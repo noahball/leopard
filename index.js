@@ -53,7 +53,7 @@ app.get('/check-in/:school/:bus', (req, res) => {
     var dayName = days[new Date().getDay()];
 
     var hours = new Date().getHours();
-    var hours = hours + 14;
+    console.log(hours)
     var ampm = (hours >= 12) ? "PM" : "AM";
 
     res.render('checkin', {
@@ -89,15 +89,13 @@ app.post('/api/v1/check-in', (req, res) => {
   const db = admin.database();
   const ref = db.ref('/check-in');
 
-  const schoolRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey);
+  const schoolRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey + '/' + req.body.name);
   schoolRef.set({
-    [req.body.name]: {
       name: req.body.name,
       bus: req.body.bus,
       date: req.body.date,
       class: req.body.class,
       journey: req.body.journey
-    }
   });
 
   res.send('success');
