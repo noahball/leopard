@@ -89,11 +89,14 @@ app.post('/api/v1/check-in', (req, res) => {
   const db = admin.database();
   const ref = db.ref('/check-in');
 
-  const schoolRef = ref.child('aquinas');
+  const schoolRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey);
   schoolRef.set({
-    alanisawesome: {
-      date_of_birth: 'June 23, 1912',
-      full_name: 'Alan Turing'
+    [req.body.name]: {
+      name: req.body.name,
+      bus: req.body.bus,
+      date: req.body.date,
+      class: req.body.class,
+      journey: req.body.journey
     }
   });
 
