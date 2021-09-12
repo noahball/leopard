@@ -85,6 +85,18 @@ app.post('/api/v1/check-in', (req, res) => {
   //res.send('incomplete')
   //} else {
   console.log('Bus: ' + req.body.bus + '\nDate: ' + req.body.date + '\nJourney: ' + req.body.journey + '\nName: ' + req.body.name + '\nTutor Class: ' + req.body.class)
+
+  const db = admin.database();
+  const ref = db.ref('/check-in');
+
+  const schoolRef = ref.child('aquinas');
+  schoolRef.set({
+    alanisawesome: {
+      date_of_birth: 'June 23, 1912',
+      full_name: 'Alan Turing'
+    }
+  });
+
   res.send('success');
   //}
 });
