@@ -98,7 +98,7 @@ app.post('/api/v1/check-in', (req, res) => {
       journey: req.body.journey
   });
 
-  res.send('success');
+  res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
   //}
 });
 
