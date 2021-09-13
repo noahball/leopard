@@ -55,12 +55,14 @@ app.get('/check-in/:school/:bus', (req, res) => {
 
     var hours = new Date().getHours();
     var ampm = (hours >= 12) ? "PM" : "AM";
+    var timeOfDay = (hours >= 12) ? "Afternoon" : "Morning";
 
     res.render('checkin', {
       busNumber: req.params.bus,
       currentDay: dayName,
       date: getDate(),
-      ampm: ampm
+      ampm: ampm,
+      timeOfDay: timeOfDay
     });
   } else {
     res.send(req.params.school + ' does not currently use Leopard.');

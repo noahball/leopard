@@ -17,7 +17,7 @@
 
 <body>
     <img class="school-logo" src="https://i0.wp.com/www.aquinas.school.nz/wp-content/uploads/2016/09/logo.png">
-    <h1 class="welcome">Good morning,</h1>
+    <h1 class="welcome">Good <%= timeOfDay %>,</h1>
     <h5>For contact tracing purposes, all students who take buses must check in.</h5>
 
     <form class="checkin-container" method="POST" action="/api/v1/check-in">
