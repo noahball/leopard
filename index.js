@@ -115,11 +115,15 @@ function getDate() {
 
 function connectionStatus() {
   const db = admin.database();
-  const ref = db.ref('/');
+  const ref = db.ref('/connection');
 
   ref.on('value', (snapshot) => {
-    console.log(snapshot.val());
+    if(snapshot.val() == 'online') {
+      console.log('Connected to Firebase RTDB.')
+    } else {
+      console.log('Connected to Firebase RTDB with message: "' + snapshot.val() + '"')
+    }
   }, (errorObject) => {
-    console.log('The read failed: ' + errorObject.name);
+    console.log('Failed to connect to Firebase RTDB: ' + errorObject.name);
   });
 }
