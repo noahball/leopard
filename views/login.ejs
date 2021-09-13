@@ -1,0 +1,79 @@
+<html>
+
+<head>
+    <title>Login | Leopard</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet">
+    <link rel="stylesheet" href="/static/login.css" />
+</head>
+
+<body>
+
+    <div id="login_div" class="main-div">
+        <h1>Leopard</h1>
+        <input type="email" placeholder="Email" id="email_field" />
+        <input type="password" placeholder="Password" id="password_field" />
+
+        <button onclick="login()">Login</button>
+        <small>
+            <center><br>Copyright © 2021 Leopard.</center>
+        </small>
+    </div>
+
+    <div id="user_div" class="loggedin-div">
+        <h1>Leopard</h1>
+        <p id="user_para">Loading...</p>
+        <button id="dashboard-button" onclick="window.location.href = '/dashboard';" style="margin-bottom: 20px;">Dashboard</button></a>
+        <button id="logout-button" onclick="logout()">Logout</button>
+      </div>
+
+      <!--<div id="login_div" class="main-div">
+        <h1 style="font-family: Bukhari Script;">Patience</h1>
+        <input type="text" placeholder="Full Name" id="name_field" />
+        <input type="email" placeholder="Email" id="email_field" />
+        <input type="password" placeholder="Password" id="password_field" />
+    
+        <button onclick="signUp()">Signup</button>
+        <small><center><br>Copyright © 2020 Noah Ball.</center></small>
+      </div>
+    
+      <div id="user_div" class="loggedin-div">
+        <h1 style="font-family: Bukhari Script;">Patience</h1>
+        <p id="user_para">Hey there!</p>
+        <button onclick="logout()">Logout</button>
+      </div>--.
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-app.js"></script>
+
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-auth.js"></script>
+
+    <!-- Firebase RTDB -->
+    <script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-database.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-analytics.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyD7cQ_OTlJG1uJwHJT_e4GSdvvHVmyHzJI",
+            authDomain: "leopard-data.firebaseapp.com",
+            databaseURL: "https://leopard-data-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "leopard-data",
+            storageBucket: "leopard-data.appspot.com",
+            messagingSenderId: "417968835087",
+            appId: "1:417968835087:web:fd2acd7df6f850aeb4f17a",
+            measurementId: "G-GNTSFLSK54"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="/static/login.js"></script>
+
+</body>
+
+</html>

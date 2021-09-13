@@ -65,7 +65,9 @@ app.get('/check-in/:school/:bus', (req, res) => {
       timeOfDay: timeOfDay
     });
   } else {
-    res.send(req.params.school + ' does not currently use Leopard.');
+    res.render('splash', {
+      body: req.params.school + ' does not currently use Leopard.'
+    });
   }
 });
 
@@ -102,6 +104,25 @@ app.post('/api/v1/check-in', (req, res) => {
 
     res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
   }
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.get('/admin', (req, res) => {
+  var idToken = req.cookies['sessionid'];
+  if (idToken == null) {
+    return res.redirect('/login');
+  }
+
+  admin.auth().verifyIdToken(idToken)
+    .then(function (decodedToken) {
+      let uid = decodedToken.uid;
+      res.render('admin');
+    }).catch(function (error) {
+      res.redirect('/login');
+    });
 });
 
 // Functions
