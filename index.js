@@ -81,25 +81,25 @@ app.post('/api/v1/check-in', (req, res) => {
   //} = validate(req.body);
   //if (error) return res.status(400).send('Something went wrong.<br>Error: ' + error.details[0].message + '<br>Press the back button in your browser to try again.');
 
-  //if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class) {
-  //res.send('incomplete')
-  //} else {
-  console.log('Bus: ' + req.body.bus + '\nDate: ' + req.body.date + '\nJourney: ' + req.body.journey + '\nName: ' + req.body.name + '\nTutor Class: ' + req.body.class)
+  if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class) {
+    res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=incomplete');
+  } else {
+    console.log('Bus: ' + req.body.bus + '\nDate: ' + req.body.date + '\nJourney: ' + req.body.journey + '\nName: ' + req.body.name + '\nTutor Class: ' + req.body.class)
 
-  const db = admin.database();
-  const ref = db.ref('/check-in');
+    const db = admin.database();
+    const ref = db.ref('/check-in');
 
-  const schoolRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey + '/' + req.body.name);
-  schoolRef.set({
+    const schoolRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey + '/' + req.body.name);
+    schoolRef.set({
       name: req.body.name,
       bus: req.body.bus,
       date: req.body.date,
       class: req.body.class,
       journey: req.body.journey
-  });
+    });
 
-  res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
-  //}
+    res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
+  }
 });
 
 // Functions
@@ -118,7 +118,7 @@ function connectionStatus() {
   const ref = db.ref('/connection');
 
   ref.on('value', (snapshot) => {
-    if(snapshot.val() == 'online') {
+    if (snapshot.val() == 'online') {
       console.log('Connected to Firebase RTDB.')
     } else {
       console.log('Connected to Firebase RTDB with message: "' + snapshot.val() + '"')
