@@ -3,8 +3,8 @@
 
 const express = require('express') // Import express.js (the web server used for Leopard)
 let ejs = require('ejs'); // Import EJS (dynamic page generator)
-var bodyParser = require('body-parser');
-const cookieParser = require("cookie-parser");
+var bodyParser = require('body-parser'); // Parser
+const cookieParser = require("cookie-parser"); // Parser
 const app = express() // Define Express
 const port = 3000 // Port for Leopard's web server to run on
 
@@ -43,7 +43,7 @@ app.use('/static', express.static('static'))
 app.get('/', (req, res) => {
   // res.send('<img src="https://www.pngmart.com/files/3/Leopard-PNG-File.png" height="100"><br><br>You\'ve reached Leopard, a simple contact tracing system for school buses. You shouldn\'t be seeing this page.<br>A project by <a href="https://www.noahball.com">Noah Ball</a>.');
   res.render('splash', {
-    body: 'You\'ve reached Leopard, a simple contact tracing system for school buses. You shouldn\'t be seeing this page.<br>A project by <a href="https://www.noahball.com">Noah Ball</a>.'
+    body: 'You\'ve reached Leopard, a simple contact tracing system for school buses.<br><b>Please scan a Leopard QR code to check-in.</b><br>A project by <a href="https://www.noahball.com">Noah Ball</a>.'
   });
 });
 
