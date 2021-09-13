@@ -119,9 +119,34 @@ app.get('/admin', (req, res) => {
   admin.auth().verifyIdToken(idToken)
     .then(function (decodedToken) {
       let uid = decodedToken.uid;
-      res.render('admin');
+      res.send(uid);
     }).catch(function (error) {
-      res.redirect('/login');
+      res.render('splash', {
+        body: 'An error occured: ' + error + '<br>Please try signing in again <a href="/login">here</a>.'
+      });
+    });
+
+    var datesRef = db.ref(`check-in/aquinas`);
+    datesRef.once("value", function (data) {
+        var dates = data.val();
+        console.log(dates);
+        try {
+            for (var i = 0; i < dates.length; i++) {
+                console.log(dates[i]);
+            }
+        } catch (err) {
+            var userServers = [];
+            var serverNames = [];
+            var isVerified = [];
+            var memberCount = [];
+            res.render('servers', {
+                userServers: userServers,
+                serverNames: serverNames,
+                isVerified: isVerified,
+                memberCount: memberCount,
+                noServers: true
+            });
+        }
     });
 });
 

@@ -15,17 +15,16 @@ firebase.auth().onAuthStateChanged(function (user) {
   if (user) {
     // User is signed in.
 
-    // Show info UI (commented out as we'll simply just redirect to the admin dashboard)
-    // document.getElementById("user_div").style.display = "block";
-    // document.getElementById("login_div").style.display = "none";
-    // document.getElementById("dashboard-button").style.display = "block";
+    document.getElementById("user_div").style.display = "block";
+    document.getElementById("login_div").style.display = "none";
+    document.getElementById("dashboard-button").style.display = "block";
 
     var user = firebase.auth().currentUser;
 
     firebase.auth().currentUser.getIdToken( /* forceRefresh */ true).then(function (idToken) {
       console.log(idToken);
       document.cookie = `sessionid=` + idToken + `; expires=Sat, 20 Apr 2069 12:00:00 UTC; path=/`;
-      window.location = "/admin";
+      //window.location = "/admin";
     }).catch(function (error) {
       console.log(`ID Token failure.\n\nDEBUG INFORMATION FOR NERDS:\n\n` + error);
     });
