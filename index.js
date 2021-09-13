@@ -21,6 +21,7 @@ var connection = db.ref("/");
 var keysRef = ref.child("keys");
 
 connectionStatus();
+console.log('Server time: ' + new Date().getHours() + ':xx. Please ensure this is the same as where Leopard is used, else bus route times may break.')
 
 // Middleware
 app.use(express.json());
@@ -53,7 +54,6 @@ app.get('/check-in/:school/:bus', (req, res) => {
     var dayName = days[new Date().getDay()];
 
     var hours = new Date().getHours();
-    console.log(hours)
     var ampm = (hours >= 12) ? "PM" : "AM";
 
     res.render('checkin', {
