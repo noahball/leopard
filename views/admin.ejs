@@ -17,10 +17,22 @@
     <h1 class="welcome">Admin Area</h1>
 
     <div class="privacy-container">
-        <h3>Please select a date:</h3>
-        <% console.log('test') %>
+        <h3>Please enter a date:</h3>
+        <form method="POST" action="/api/v1/lookup">
+            <input type="date" id="date" name="date">
+            <br>
+            <br>
+            <h3>Please enter a bus:</h3>
+            <input type="text" id="bus" name="bus">
+            <br>
+            <br>
+            <h3>Please enter a journey (AM OR PM):</h3>
+            <input type="text" id="journey" name="journey">
+            <input type="submit">
+        </form>
     </div>
-    <p><br>Powered by Leopard, a check-in system for students by Noah Ball.<br><a href="/privacy">Privacy Policy</a> | <a href="/source">Source Code</a></p>
+    <p><br>Powered by Leopard, a check-in system for students by Noah Ball.<br><a href="/privacy">Privacy Policy</a> |
+        <a href="/source">Source Code</a></p>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
     </script>

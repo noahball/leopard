@@ -24,7 +24,7 @@ firebase.auth().onAuthStateChanged(function (user) {
     firebase.auth().currentUser.getIdToken( /* forceRefresh */ true).then(function (idToken) {
       console.log(idToken);
       document.cookie = `sessionid=` + idToken + `; expires=Sat, 20 Apr 2069 12:00:00 UTC; path=/`;
-      //window.location = "/admin";
+      window.location = "/admin";
     }).catch(function (error) {
       console.log(`ID Token failure.\n\nDEBUG INFORMATION FOR NERDS:\n\n` + error);
     });
