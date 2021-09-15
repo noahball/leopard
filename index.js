@@ -215,7 +215,7 @@ function connectionStatus() {
   const db = admin.database();
   const ref = db.ref('/connection');
 
-  ref.on('value', (snapshot) => {
+  ref.once('value', (snapshot) => {
     if (snapshot.val() == 'online') {
       console.log('Connected to Firebase RTDB.')
     } else {
