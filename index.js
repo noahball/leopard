@@ -93,14 +93,34 @@ app.post('/api/v1/check-in', (req, res) => {
     const db = admin.database();
     const ref = db.ref('/check-in');
 
-    const schoolRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey + '/' + req.body.name);
-    schoolRef.set({
-      name: req.body.name,
-      bus: req.body.bus,
-      date: req.body.date,
-      class: req.body.class,
-      journey: req.body.journey
+    const schoolArraysRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey);
+    schoolArraysRef.once("value", function (data) {
+
+      try {
+        var currentID = data.val().currentID;
+      } catch(err) {
+        schoolArraysRef.update({
+          currentID: 0
+        });
+        var currentID = 0;
+      }
+
+      var newID = currentID + 1;
+      schoolArraysRef.update({
+        [`students/` + currentID]: req.body.name,
+        [`students-tutor/` + currentID]: req.body.class,
+        currentID: newID
+      });
     });
+
+    //const schoolRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey + '/' + req.body.name);
+    //schoolRef.set({
+    //name: req.body.name,
+    //bus: req.body.bus,
+    //date: req.body.date,
+    //class: req.body.class,
+    //journey: req.body.journey
+    //});
 
     res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
   }
