@@ -98,7 +98,7 @@ app.post('/api/v1/check-in', (req, res) => {
 
       try {
         var currentID = data.val().currentID;
-      } catch(err) {
+      } catch (err) {
         schoolArraysRef.update({
           currentID: 0
         });
@@ -108,7 +108,7 @@ app.post('/api/v1/check-in', (req, res) => {
       var newID = currentID + 1;
       schoolArraysRef.update({
         [`students/` + currentID]: req.body.name,
-        [`students-tutor/` + currentID]: req.body.class,
+        [`studentsTutor/` + currentID]: req.body.class,
         currentID: newID
       });
     });
@@ -147,13 +147,20 @@ app.post('/api/v1/lookup', (req, res) => {
 
     const schoolRef = ref.child('aquinas/' + dateString + '/' + req.body.bus + '/' + req.body.journey);
     console.log('aquinas/' + dateString + '/' + req.body.bus + '/' + req.body.journey);
+
     schoolRef.once('value', (data) => {
-      console.log(data.val());
+      try {
+        var studentsArray = data.val().students;
+        var tutorsArray = data.val().studentsTutor;
+        res.send(`Students: ` + studentsArray + `\n Students' Classes: ` + tutorsArray)
+      } catch (err) {
+        console.log(err);
+      }
     }, (errorObject) => {
       console.log('The read failed: ' + errorObject.name);
     });
 
-    res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
+    //res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
   }
 });
 
