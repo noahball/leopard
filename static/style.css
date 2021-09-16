@@ -61,3 +61,7 @@ h5 {
 .swal2-styled.swal2-confirm {
     background-color: #005A4E !important;
 }
+
+.back, .back:hover {
+    color: #FFFFFF;
+}
