@@ -41,7 +41,6 @@ app.set('view engine', 'ejs');
 app.use('/static', express.static('static'))
 
 app.get('/', (req, res) => {
-  // res.send('<img src="https://www.pngmart.com/files/3/Leopard-PNG-File.png" height="100"><br><br>You\'ve reached Leopard, a simple contact tracing system for school buses. You shouldn\'t be seeing this page.<br>A project by <a href="https://www.noahball.com">Noah Ball</a>.');
   res.render('splash', {
     body: 'You\'ve reached Leopard, a simple contact tracing system for school buses.<br><b>Please scan a Leopard QR code to check-in.</b><br>A project by <a href="https://www.noahball.com">Noah Ball</a>.'
   });
@@ -80,16 +79,9 @@ app.listen(port, () => {
 })
 
 app.post('/api/v1/check-in', (req, res) => {
-  //const {
-  //error
-  //} = validate(req.body);
-  //if (error) return res.status(400).send('Something went wrong.<br>Error: ' + error.details[0].message + '<br>Press the back button in your browser to try again.');
-
   if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class) {
     res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=incomplete');
   } else {
-    console.log('Bus: ' + req.body.bus + '\nDate: ' + req.body.date + '\nJourney: ' + req.body.journey + '\nName: ' + req.body.name + '\nTutor Class: ' + req.body.class)
-
     const db = admin.database();
     const ref = db.ref('/check-in');
 
@@ -113,35 +105,24 @@ app.post('/api/v1/check-in', (req, res) => {
       });
     });
 
-    //const schoolRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey + '/' + req.body.name);
-    //schoolRef.set({
-    //name: req.body.name,
-    //bus: req.body.bus,
-    //date: req.body.date,
-    //class: req.body.class,
-    //journey: req.body.journey
-    //});
-
     res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
+
   }
 });
 
 app.post('/api/v1/lookup', (req, res) => {
   if (!req.body.bus || !req.body.date || !req.body.journey) {
-    res.redirect('/lookup' + req.body.bus + '?result=incomplete');
+    res.redirect('/admin' + '?result=incomplete');
   } else {
     // Swap from American date format to Aotearoa date format
     var dateString = req.body.date;
     console.log(req.body.date);
     dateString = dateString.substr(8, 2) + "-" + dateString.substr(5, 2) + "-" + dateString.substr(0, 4);
 
-    console.log('Bus: ' + req.body.bus + '\nDate: ' + dateString + '\nJourney: ' + req.body.journey)
-
     const db = admin.database();
     const ref = db.ref('/check-in');
 
     const schoolRef = ref.child('aquinas/' + dateString + '/' + req.body.bus + '/' + req.body.journey);
-    console.log('aquinas/' + dateString + '/' + req.body.bus + '/' + req.body.journey);
 
     schoolRef.once('value', (data) => {
       try {
@@ -190,22 +171,8 @@ app.get('/admin', (req, res) => {
 
   admin.auth().verifyIdToken(idToken)
     .then(function (decodedToken) {
-      let uid = decodedToken.uid;
-      console.log(uid);
-
-      var datesRef = db.ref(`check-in/aquinas`);
-      datesRef.once("value", function (data) {
-        var dates = data.val();
-        console.log(dates);
-        res.render('admin');
-        try {
-          for (var i = 0; i < dates.length; i++) {
-            console.log(dates[i]);
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      });
+      // let uid = decodedToken.uid;
+      res.render('admin');
     }).catch(function (error) {
       if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
         res.render('splash', {
