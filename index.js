@@ -53,8 +53,10 @@ app.get('/check-in/:school/:bus', (req, res) => { // Check-in page
     var ampm = (hours >= 12) ? "PM" : "AM"; // Is it currently AM or PM?
     var timeOfDay = (hours >= 12) ? "Afternoon" : "Morning"; // AM/PM > Morning/Afternoon translation
 
+    var busFormatted = req.params.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
+
     res.render('checkin', { // Render the check-in page
-      busNumber: req.params.bus, // Bus number grabbed from the request URL
+      busNumber: busFormatted, // Bus number grabbed from the request URL
       currentDay: dayName, // Current day
       date: getDate(), // Current date (grabbed from function at the bottom of this file)
       ampm: ampm, // Is it AM or PM right now?
@@ -78,7 +80,10 @@ app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
     const db = admin.database(); // Define the DB
     const ref = db.ref('/check-in'); // Define the reference to use
 
-    const schoolArraysRef = ref.child('aquinas/' + req.body.date + '/' + req.body.bus + '/' + req.body.journey); // Extend on the reference to get the location that data will be stored
+    var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
+    var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
+
+    const schoolArraysRef = ref.child('aquinas/' + req.body.date + '/' + busFormatted + '/' + journeyFormatted); // Extend on the reference to get the location that data will be stored
     schoolArraysRef.once("value", function (data) { // Read data from the reference above
 
       try {
@@ -114,10 +119,13 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
     // Grab positions 5 and 6 from req.body.date (MM)
     // Grab positions 0, 1, 2, 3 and 4 from req.body.date (YYYY)
     // All of this is merged together into our DD-MM-YY format.
+
+    var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
+    var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
     const db = admin.database(); // Define DB
     const ref = db.ref('/check-in'); // Database reference
 
-    const schoolRef = ref.child('aquinas/' + dateString + '/' + req.body.bus + '/' + req.body.journey); // Expand on the database reference to the location we want to read data from
+    const schoolRef = ref.child('aquinas/' + dateString + '/' + busFormatted + '/' + journeyFormatted); // Expand on the database reference to the location we want to read data from
 
     schoolRef.once('value', (data) => { // Read the data
       try { // Try this
@@ -128,7 +136,7 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
         var timeOfDay = (hours >= 12) ? "afternoon" : "morning"; // If after 12pm, it's afternoon, else it's morning
 
         res.render('results', { // Render the results page
-          busNumber: req.body.bus, // Bus number looked up
+          busNumber: busFormatted, // Bus number looked up
           date: dateString, // Date looked up
           timeOfDay: timeOfDay, // Journey time in morning/afternoon format
           students: studentsArray, // Students array
