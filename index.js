@@ -127,11 +127,6 @@ app.post('/api/v1/check-in', (req, res) => {
 });
 
 app.post('/api/v1/lookup', (req, res) => {
-  //const {
-  //error
-  //} = validate(req.body);
-  //if (error) return res.status(400).send('Something went wrong.<br>Error: ' + error.details[0].message + '<br>Press the back button in your browser to try again.');
-
   if (!req.body.bus || !req.body.date || !req.body.journey) {
     res.redirect('/lookup' + req.body.bus + '?result=incomplete');
   } else {
@@ -152,15 +147,34 @@ app.post('/api/v1/lookup', (req, res) => {
       try {
         var studentsArray = data.val().students;
         var tutorsArray = data.val().studentsTutor;
-        res.send(`Students: ` + studentsArray + `\n Students' Classes: ` + tutorsArray)
-      } catch (err) {
-        console.log(err);
-      }
-    }, (errorObject) => {
-      console.log('The read failed: ' + errorObject.name);
-    });
 
-    //res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success');
+        var hours = new Date().getHours();
+        var timeOfDay = (hours >= 12) ? "afternoon" : "morning";
+
+        res.render('results', {
+          busNumber: req.body.bus,
+          date: dateString,
+          timeOfDay: timeOfDay,
+          students: studentsArray,
+          tutors: tutorsArray,
+          resultsFound: true
+        });
+      } catch (err) {
+        try {
+          // Trying to narrow down the error here. Don't want to return a 'no results' message if a different errror was encountered. A null value always crashes node... so I can't just simply check for it :/
+          var studentsArray = data.val().students;
+          res.send('Something went wrong. Debug information:<br>' + err) // This response will only run if there's an error with running the line before, meaning that the students value was successfully recieved from Firebase, but something else is amiss.
+          console.log('An unexpected error was encountered: ' + err); // Log it, because something really went to custard!
+        } catch (err) { // There was an error in the try statement - normally this is that execution stopped because data.val().students is empty (there is no data for the params entered!). Assume this, and throw a no results found screen.
+          res.render('results', {
+            resultsFound: false
+          });
+        }
+      }
+    }, (errorObject) => { // Error encountered related to Firebase
+      res.send('Something went wrong. Debug information:<br>' + errorObject.name)
+      console.log('An unexpected error was encountered: ' + errorObject.name); // Log it, because something really went to custard!
+    });
   }
 });
 
