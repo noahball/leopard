@@ -11,4 +11,10 @@ if(queryString == '?signed-in=success') {
     title: 'Whoops!',
     text: 'Please fill in both your name and tutor class.',
   })
+} else if(queryString == '?result=incomplete') {
+  Swal.fire({
+    icon: 'error',
+    title: 'Whoops!',
+    text: 'Please fill in all fields.',
+  })
 }
