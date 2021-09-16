@@ -147,7 +147,9 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
         try {
           // Trying to narrow down the error here. Don't want to return a 'no results' message if a different error was encountered. A null value always crashes node... so I can't just simply check for it :/
           var studentsArray = data.val().students;
-          res.send('Something went wrong. Debug information:<br>' + err) // This response will only run if there's an error with running the line before, meaning that the students value was successfully recieved from Firebase, but something else is amiss.
+          res.render('splash', { // Render the splash screen...
+            body: 'Something went wrong. Debug information for nerds:<br>' + err // ...but set the text differently
+          }); // This response will only run if there's an error with running the line before, meaning that the students value was successfully recieved from Firebase, but something else is amiss.
           console.log('An unexpected error was encountered: ' + err); // Log it, because something really went to custard!
         } catch (err) { // There was an error in the try statement - normally this is that execution stopped because data.val().students is empty (there is no data for the params entered!). Assume this, and throw a no results found screen.
           res.render('results', { // Render the results page
@@ -156,7 +158,9 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
         }
       }
     }, (errorObject) => { // Error encountered related to Firebase
-      res.send('Something went wrong. Debug information:<br>' + errorObject.name) // Tell the user the nerdy debug info so I look cool (yikes!)
+      res.render('splash', { // Render the splash screen...
+        body: 'Something went wrong. Debug information for nerds:<br>' + errorObject.name // ...but set the text differently
+      }); // Tell the user the nerdy debug info so I look cool (yikes!)
       console.log('An unexpected error was encountered: ' + errorObject.name); // Log it, because something really went to custard!
     });
   }
@@ -182,7 +186,7 @@ app.get('/admin', (req, res) => { // /admin page
 
         // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
         res.render('splash', {
-          body: 'An error occured: ' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
+          body: 'Something went wrong. Debug information for nerds:<br>' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
         });
       } else {
         res.redirect('/login'); // Else, their ID token has expired. Chuck em to the login page, and it'll automagically update it without them needing to enter their credentials again, it'll throw them back here and this code will run again (and hopefully not loop them into oblivion #nocookiesusersffs)
