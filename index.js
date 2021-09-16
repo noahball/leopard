@@ -116,7 +116,6 @@ app.post('/api/v1/lookup', (req, res) => {
   } else {
     // Swap from American date format to Aotearoa date format
     var dateString = req.body.date;
-    console.log(req.body.date);
     dateString = dateString.substr(8, 2) + "-" + dateString.substr(5, 2) + "-" + dateString.substr(0, 4);
 
     const db = admin.database();
