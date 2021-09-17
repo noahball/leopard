@@ -17,18 +17,20 @@
     <h1 class="welcome">Admin Area</h1>
 
     <div class="privacy-container">
-        <h3>Please enter a date:</h3>
         <form method="POST" action="/api/v1/lookup">
-            <input type="date" id="date" name="date">
-            <br>
-            <br>
-            <h3>Please enter a bus:</h3>
-            <input type="text" id="bus" name="bus">
-            <br>
-            <br>
-            <h3>Please enter a journey (AM OR PM):</h3>
-            <input type="text" id="journey" name="journey">
-            <input type="submit">
+            <div class="mb-3 container-form">
+                <input type="date" class="form-control" id="date" name="date" placeholder="Enter a date">
+            </div>
+            <div class="mb-3 container-form">
+                <input type="text" class="form-control" id="bus" name="bus" placeholder="Enter a bus">
+            </div>
+            <div class="mb-3 container-form">
+                <input type="text" class="form-control" id="journey" name="journey" placeholder="Enter a journey (AM or PM)">
+            </div>
+    
+            <div class="center">
+                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+            </div>
         </form>
     </div>
     <p><br>Powered by Leopard, a check-in system for students by Noah Ball.<br><a href="/privacy">Privacy Policy</a> |

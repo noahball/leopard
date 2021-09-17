@@ -65,3 +65,7 @@ h5 {
 .back, .back:hover {
     color: #FFFFFF;
 }
+
+.center {
+    text-align: center;
+}
