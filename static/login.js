@@ -1,14 +1,18 @@
 function writeUserData() {
-  var userEmail = document.getElementById("email_field").value;
-  var userName = document.getElementById("name_field").value;
-  var cutEmail = userEmail.substring(0, userEmail.lastIndexOf("@"));
-
-  var school = "aquinas";
-  firebase.database().ref('/users/' + school + '/' + cutEmail).set({
-    name: userName,
-    email: userEmail,
-    role: "administrator"
-  });
+  setTimeout(function(){
+    var userEmail = document.getElementById("email_field").value;
+    var userName = document.getElementById("name_field").value;
+    var cutEmail = userEmail.substring(0, userEmail.lastIndexOf("@"));
+    var currentUser = firebase.auth().currentUser;
+    var uid = currentUser.uid;
+  
+    var school = "aquinas";
+    firebase.database().ref('/users/' + school + '/' + uid).set({
+      name: userName,
+      email: userEmail,
+      role: "administrator"
+    });
+}, 2000);
 }
 
 firebase.auth().onAuthStateChanged(function (user) {
