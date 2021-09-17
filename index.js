@@ -132,8 +132,7 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
         var studentsArray = data.val().students; // Grab the students' names for the bus/time in question. This is retrieved as an array from Firebase
         var tutorsArray = data.val().studentsTutor; // Grab the students' tutor classes for the bus/time in question. This is retrieved as an array from Firebase
 
-        var hours = new Date().getHours(); // Date object
-        var timeOfDay = (hours >= 12) ? "afternoon" : "morning"; // If after 12pm, it's afternoon, else it's morning
+        var timeOfDay = (journeyFormatted == "PM") ? "afternoon" : "morning"; // If after 12pm, it's afternoon, else it's morning
 
         res.render('results', { // Render the results page
           busNumber: busFormatted, // Bus number looked up
