@@ -117,6 +117,8 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
       .then(function (decodedToken) { // Yes, it's a real token!
         // They're genuine, let them through the floodgates.
 
+        var requestedByVar = requestedBy(decodedToken.uid);
+
         // Else if all fields are filled
         // Swap from American date format to Aotearoa date format
         var dateString = req.body.date; // Grab the date from the date field
@@ -130,6 +132,7 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
         var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
         const db = admin.database(); // Define DB
         const ref = db.ref('/check-in'); // Database reference
+        const usersRef = db.ref('/users/aquinas/' + requestedBy)
 
         const schoolRef = ref.child('aquinas/' + dateString + '/' + busFormatted + '/' + journeyFormatted); // Expand on the database reference to the location we want to read data from
 
@@ -146,7 +149,8 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
               timeOfDay: timeOfDay, // Journey time in morning/afternoon format
               students: studentsArray, // Students array
               tutors: tutorsArray, // Tutor classes array
-              resultsFound: true // Yes, we found results
+              resultsFound: true, // Yes, we found results
+              requestedBy: requestedByVar // Who requested these results
             });
           } catch (err) { // An error is normally encountered when trying to grab the students array above when there aren't any check-ins for the specified params!
             try {
@@ -244,5 +248,23 @@ function connectionStatus() { // Connection status thingy because I like being t
     }
   }, (errorObject) => {
     console.log('Failed to connect to Firebase RTDB: ' + errorObject.name); // Firebase committed bath toaster SCREAM (or maybe /connection just doesn't exist)
+  });
+}
+
+function requestedBy(uid) { // Connection status thingy because I like being technical, okay?
+  const db = admin.database(); // Define the database
+  const ref = db.ref('/users/aquinas/' + uid); // Database reference
+
+  ref.once('value', (snapshot) => { // Grab the data from the reference above
+    if(!snapshot.val().name) {
+      var response = 'Error'
+      return response
+    } else {
+      var response = snapshot.val().name
+      return response
+    }
+  }, (errorObject) => {
+    console.log('requestedBy Error: ' + errorObject.name); // Firebase committed bath toaster SCREAM (or maybe /connection just doesn't exist)
+    return "Error"
   });
 }
