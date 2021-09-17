@@ -30,6 +30,9 @@ app.use(cookieParser()); // To read cookies (such as the session ID for the admi
 const {
   render
 } = require('ejs'); // EJS (rendering engine)
+const {
+  response
+} = require('express');
 
 // Use ejs to render pages
 app.set('view engine', 'ejs');
@@ -117,72 +120,78 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
       .then(function (decodedToken) { // Yes, it's a real token!
         // They're genuine, let them through the floodgates.
 
-        var requestedByVar = requestedBy(decodedToken.uid);
+        const db = admin.database(); // Define the database
+        const requestedRef = db.ref(`/users/aquinas/` + decodedToken.uid + `/name`); // Database reference
+        console.log(`/users/aquinas/` + decodedToken.uid + `/name`)
 
-        // Else if all fields are filled
-        // Swap from American date format to Aotearoa date format
-        var dateString = req.body.date; // Grab the date from the date field
-        dateString = dateString.substr(8, 2) + "-" + dateString.substr(5, 2) + "-" + dateString.substr(0, 4); // HTML date fields display the date differently to us, so we'll rearrange it to suit the way we format the date (which is DD-MM-YYYY)
-        // Grab positions 8 and 9 from req.body.date (DD)
-        // Grab positions 5 and 6 from req.body.date (MM)
-        // Grab positions 0, 1, 2, 3 and 4 from req.body.date (YYYY)
-        // All of this is merged together into our DD-MM-YY format.
+        requestedRef.once('value', (snapshot) => { // Grab the data from the reference above
+          var requestedByVar = snapshot.val();
+          // Else if all fields are filled
+          // Swap from American date format to Aotearoa date format
+          var dateString = req.body.date; // Grab the date from the date field
+          dateString = dateString.substr(8, 2) + "-" + dateString.substr(5, 2) + "-" + dateString.substr(0, 4); // HTML date fields display the date differently to us, so we'll rearrange it to suit the way we format the date (which is DD-MM-YYYY)
+          // Grab positions 8 and 9 from req.body.date (DD)
+          // Grab positions 5 and 6 from req.body.date (MM)
+          // Grab positions 0, 1, 2, 3 and 4 from req.body.date (YYYY)
+          // All of this is merged together into our DD-MM-YY format.
 
-        var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
-        var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
-        const db = admin.database(); // Define DB
-        const ref = db.ref('/check-in'); // Database reference
-        const usersRef = db.ref('/users/aquinas/' + requestedBy)
+          var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
+          var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
+          const ref = db.ref('/check-in'); // Database reference
 
-        const schoolRef = ref.child('aquinas/' + dateString + '/' + busFormatted + '/' + journeyFormatted); // Expand on the database reference to the location we want to read data from
+          const schoolRef = ref.child('aquinas/' + dateString + '/' + busFormatted + '/' + journeyFormatted); // Expand on the database reference to the location we want to read data from
 
-        schoolRef.once('value', (data) => { // Read the data
-          try { // Try this
-            var studentsArray = data.val().students; // Grab the students' names for the bus/time in question. This is retrieved as an array from Firebase
-            var tutorsArray = data.val().studentsTutor; // Grab the students' tutor classes for the bus/time in question. This is retrieved as an array from Firebase
+          schoolRef.once('value', (data) => { // Read the data
+            try { // Try this
+              var studentsArray = data.val().students; // Grab the students' names for the bus/time in question. This is retrieved as an array from Firebase
+              var tutorsArray = data.val().studentsTutor; // Grab the students' tutor classes for the bus/time in question. This is retrieved as an array from Firebase
 
-            var timeOfDay = (journeyFormatted == "PM") ? "afternoon" : "morning"; // If after 12pm, it's afternoon, else it's morning
+              var timeOfDay = (journeyFormatted == "PM") ? "afternoon" : "morning"; // If after 12pm, it's afternoon, else it's morning
 
-            res.render('results', { // Render the results page
-              busNumber: busFormatted, // Bus number looked up
-              date: dateString, // Date looked up
-              timeOfDay: timeOfDay, // Journey time in morning/afternoon format
-              students: studentsArray, // Students array
-              tutors: tutorsArray, // Tutor classes array
-              resultsFound: true, // Yes, we found results
-              requestedBy: requestedByVar // Who requested these results
-            });
-          } catch (err) { // An error is normally encountered when trying to grab the students array above when there aren't any check-ins for the specified params!
-            try {
-              // Trying to narrow down the error here. Don't want to return a 'no results' message if a different error was encountered. A null value always crashes node... so I can't just simply check for it :/
-              var studentsArray = data.val().students;
-              res.render('splash', { // Render the splash screen...
-                body: 'Something went wrong. Debug information for nerds:<br>' + err // ...but set the text differently
-              }); // This response will only run if there's an error with running the line before, meaning that the students value was successfully recieved from Firebase, but something else is amiss.
-              console.log('An unexpected error was encountered: ' + err); // Log it, because something really went to custard!
-            } catch (err) { // There was an error in the try statement - normally this is that execution stopped because data.val().students is empty (there is no data for the params entered!). Assume this, and throw a no results found screen.
               res.render('results', { // Render the results page
-                resultsFound: false // No, we didn't find any results matching the criteria provided
+                busNumber: busFormatted, // Bus number looked up
+                date: dateString, // Date looked up
+                timeOfDay: timeOfDay, // Journey time in morning/afternoon format
+                students: studentsArray, // Students array
+                tutors: tutorsArray, // Tutor classes array
+                resultsFound: true, // Yes, we found results
+                requestedBy: requestedByVar // Who requested these results
               });
+            } catch (err) { // An error is normally encountered when trying to grab the students array above when there aren't any check-ins for the specified params!
+              try {
+                // Trying to narrow down the error here. Don't want to return a 'no results' message if a different error was encountered. A null value always crashes node... so I can't just simply check for it :/
+                var studentsArray = data.val().students;
+                res.render('splash', { // Render the splash screen...
+                  body: 'Something went wrong. Debug information for nerds:<br>' + err // ...but set the text differently
+                }); // This response will only run if there's an error with running the line before, meaning that the students value was successfully recieved from Firebase, but something else is amiss.
+                console.log('An unexpected error was encountered: ' + err); // Log it, because something really went to custard!
+              } catch (err) { // There was an error in the try statement - normally this is that execution stopped because data.val().students is empty (there is no data for the params entered!). Assume this, and throw a no results found screen.
+                res.render('results', { // Render the results page
+                  resultsFound: false // No, we didn't find any results matching the criteria provided
+                });
+              }
             }
-          }
-        }, (errorObject) => { // Error encountered related to Firebase
-          res.render('splash', { // Render the splash screen...
-            body: 'Something went wrong. Debug information for nerds:<br>' + errorObject.name // ...but set the text differently
-          }); // Tell the user the nerdy debug info so I look cool (yikes!)
-          console.log('An unexpected error was encountered: ' + errorObject.name); // Log it, because something really went to custard!
-        });
-      }).catch(function (error) { // IMPOSTOR! IMPOSTOR! AMOGUS SUS
-        // Check if their ID token actually just expired...
-        if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
-
-          // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
-          res.render('splash', {
-            body: 'Something went wrong. Debug information for nerds:<br>' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
+          }, (errorObject) => { // Error encountered related to Firebase
+            res.render('splash', { // Render the splash screen...
+              body: 'Something went wrong. Debug information for nerds:<br>' + errorObject.name // ...but set the text differently
+            }); // Tell the user the nerdy debug info so I look cool (yikes!)
+            console.log('An unexpected error was encountered: ' + errorObject.name); // Log it, because something really went to custard!
           });
-        } else {
-          res.redirect('/login'); // Else, their ID token has expired. Chuck em to the login page, and it'll automagically update it without them needing to enter their credentials again, it'll throw them back here and this code will run again (and hopefully not loop them into oblivion #nocookiesusersffs)
-        }
+        }).catch(function (error) { // IMPOSTOR! IMPOSTOR! AMOGUS SUS
+          // Check if their ID token actually just expired...
+          if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
+
+            // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
+            res.render('splash', {
+              body: 'Something went wrong. Debug information for nerds:<br>' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
+            });
+          } else {
+            res.redirect('/login'); // Else, their ID token has expired. Chuck em to the login page, and it'll automagically update it without them needing to enter their credentials again, it'll throw them back here and this code will run again (and hopefully not loop them into oblivion #nocookiesusersffs)
+          }
+        });
+      }, (errorObject) => {
+        console.log('requestedBy Error: ' + errorObject.name); // Firebase committed bath toaster SCREAM (or maybe /connection just doesn't exist)
+        return "Error"
       });
   }
 });
@@ -251,20 +260,19 @@ function connectionStatus() { // Connection status thingy because I like being t
   });
 }
 
-function requestedBy(uid) { // Connection status thingy because I like being technical, okay?
-  const db = admin.database(); // Define the database
-  const ref = db.ref('/users/aquinas/' + uid); // Database reference
+//function requestedBy(uid) { // Connection status thingy because I like being technical, okay?
+//const db = admin.database(); // Define the database
+//const ref = db.ref('/users/aquinas/' + uid + `/name`); // Database reference
 
-  ref.once('value', (snapshot) => { // Grab the data from the reference above
-    if(!snapshot.val().name) {
-      var response = 'Error'
-      return response
-    } else {
-      var response = snapshot.val().name
-      return response
-    }
-  }, (errorObject) => {
-    console.log('requestedBy Error: ' + errorObject.name); // Firebase committed bath toaster SCREAM (or maybe /connection just doesn't exist)
-    return "Error"
-  });
+//ref.once('value', (snapshot) => { // Grab the data from the reference above
+//var personWhoRequested = snapshot.val();
+//return personWhoRequested;
+//}, (errorObject) => {
+//console.log('requestedBy Error: ' + errorObject.name); // Firebase committed bath toaster SCREAM (or maybe /connection just doesn't exist)
+//return "Error"
+//});
+//}
+
+function setVariable(x) {
+  return x;
 }
