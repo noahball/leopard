@@ -214,6 +214,10 @@ app.get('/login', (req, res) => {
   res.render('login'); // Render the static /login page (authentication is handled through client side JS - it's just easier - see /static/login.js)
 });
 
+app.get('/signup', (req, res) => {
+  res.render('signup'); // Render the static /signup page (authentication is handled through client side JS - it's just easier - see /static/login.js)
+});
+
 app.get('/admin', (req, res) => { // /admin page
   var idToken = req.cookies['sessionid']; // Grab the ID token set when the user logs in (this token is set in /static/login.js)
   if (idToken == null) { // If the idToken cookie doesn't exist
