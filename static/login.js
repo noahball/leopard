@@ -44,7 +44,6 @@ firebase.auth().onAuthStateChanged(function (user) {
 
     document.getElementById("user_div").style.display = "block";
     document.getElementById("login_div").style.display = "none";
-    document.getElementById("dashboard-button").style.display = "block";
 
     var user = firebase.auth().currentUser;
 
@@ -93,6 +92,7 @@ function login() {
 
 function logout() {
   firebase.auth().signOut();
+  document.cookie = "sessionid= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
 }
 
 function getUserInfo() {
@@ -104,7 +104,6 @@ function getUserInfo() {
     setTimeout(() => {
       if (!snapshot.exists()) {
         document.getElementById("user_para").innerHTML = "OH NO! It appears your account is corrupt. Please contact Leopard support for further assistance.";
-        document.getElementById("dashboard-button").style.display = "none";
       } else {
         var userName = snapshot.val().name;
         var role = snapshot.val().role;
