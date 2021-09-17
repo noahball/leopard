@@ -1,18 +1,41 @@
 function writeUserData() {
-  setTimeout(function(){
-    var userEmail = document.getElementById("email_field").value;
-    var userName = document.getElementById("name_field").value;
-    var cutEmail = userEmail.substring(0, userEmail.lastIndexOf("@"));
+  var userEmail = document.getElementById("email_field").value;
+  var userName = document.getElementById("name_field").value;
+
+  var userEmail = document.getElementById("email_field").value;
+  var userPass = document.getElementById("password_field").value;
+
+  firebase.auth().signInWithEmailAndPassword(userEmail, userPass).then(function () {
     var currentUser = firebase.auth().currentUser;
     var uid = currentUser.uid;
-  
+
     var school = "aquinas";
     firebase.database().ref('/users/' + school + '/' + uid).set({
       name: userName,
       email: userEmail,
       role: "administrator"
     });
-}, 2000);
+
+    firebase.auth().currentUser.getIdToken( /* forceRefresh */ true).then(function (idToken) {
+      console.log(idToken);
+      document.cookie = `sessionid=` + idToken + `; expires=Sat, 20 Apr 2069 12:00:00 UTC; path=/`;
+      window.location = "/admin";
+    }).catch(function (error) {
+      console.log(`ID Token failure.\n\nDEBUG INFORMATION FOR NERDS:\n\n` + error);
+    });
+
+  }).catch(function (error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+
+    Swal.fire({
+      title: 'And I oop!',
+      text: 'An error occured. ' + errorMessage + ' Or just give up and save the turtles instead. Up to you!',
+      icon: 'error',
+      confirmButtonText: 'sksksksk'
+    })
+  });
 }
 
 firebase.auth().onAuthStateChanged(function (user) {
@@ -73,10 +96,10 @@ function logout() {
 }
 
 function getUserInfo() {
-  var email = firebase.auth().currentUser.email;
-  var cutEmail = email.substring(0, email.lastIndexOf("@"));
   var school = "aquinas";
-  return firebase.database().ref(`/users/` + school + `/` + cutEmail).once('value').then(function (snapshot) {
+  var currentUser = firebase.auth().currentUser;
+  var uid = currentUser.uid;
+  return firebase.database().ref(`/users/` + school + `/` + uid).once('value').then(function (snapshot) {
     // YES THIS IS TECHNICALLY FAKE LOADING... however if this wasn't implemented you would see a brief corrupt message while the app is connecting to Firebase.
     setTimeout(() => {
       if (!snapshot.exists()) {
@@ -97,7 +120,9 @@ function signUp() {
   var userEmail = document.getElementById("email_field").value;
   var userPass = document.getElementById("password_field").value;
 
-  firebase.auth().createUserWithEmailAndPassword(userEmail, userPass).catch(function (error) {
+  firebase.auth().createUserWithEmailAndPassword(userEmail, userPass).then(function () {
+    setTimeout(writeUserData(), 2000);
+  }).catch(function (error) {
     // Handle Errors here.
     var errorCode = error.code;
     var errorMessage = error.message;
@@ -110,10 +135,6 @@ function signUp() {
     })
 
   });
-
-  writeUserData();
-  loginAfterSignUp();
-
 }
 
 function loginAfterSignUp() {
@@ -126,7 +147,9 @@ function loginAfterSignUp() {
     var errorCode = error.code;
     var errorMessage = error.message;
 
-    // ...
+    console.log(errorMessage);
   });
+
+  writeUserData();
 
 }

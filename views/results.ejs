@@ -15,7 +15,7 @@
 <body>
     <img class="school-logo" src="https://i0.wp.com/www.aquinas.school.nz/wp-content/uploads/2016/09/logo.png">
     <h1 class="welcome">Query Results</h1>
-    <h5>Requested by <%= requestedBy %></h5>
+    <% if(resultsFound == true) { %><h5>Requested by <%= requestedBy %></h5><% } %>
     
     <div class="privacy-container">
         <% if(resultsFound == true) { %>

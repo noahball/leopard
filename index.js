@@ -118,14 +118,18 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
     var idToken = req.body.idToken;
     admin.auth().verifyIdToken(idToken) // So they provided an ID token, but is it a real ID token?
       .then(function (decodedToken) { // Yes, it's a real token!
+        
         // They're genuine, let them through the floodgates.
 
         const db = admin.database(); // Define the database
         const requestedRef = db.ref(`/users/aquinas/` + decodedToken.uid + `/name`); // Database reference
-        console.log(`/users/aquinas/` + decodedToken.uid + `/name`)
 
         requestedRef.once('value', (snapshot) => { // Grab the data from the reference above
           var requestedByVar = snapshot.val();
+          if(requestedByVar == null) { // Isn't an actual valid id token. Sneaky impostor!
+            res.redirect('/login');
+            return
+          }
           // Else if all fields are filled
           // Swap from American date format to Aotearoa date format
           var dateString = req.body.date; // Grab the date from the date field
@@ -179,7 +183,7 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
           });
         }).catch(function (error) { // IMPOSTOR! IMPOSTOR! AMOGUS SUS
           // Check if their ID token actually just expired...
-          if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
+          if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token." && error != "Firebase ID token has invalid signature. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
 
             // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
             res.render('splash', {
@@ -190,8 +194,18 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
           }
         });
       }, (errorObject) => {
-        console.log('requestedBy Error: ' + errorObject.name); // Firebase committed bath toaster SCREAM (or maybe /connection just doesn't exist)
-        return "Error"
+        var error = errorObject.message;
+        console.log(error);
+        // Check if their ID token actually just expired...
+        if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token." && error != "Firebase ID token has invalid signature. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
+
+          // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
+          res.render('splash', {
+            body: 'Something went wrong. Debug information for nerds:<br>' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
+          });
+        } else {
+          res.redirect('/login'); // Else, their ID token has expired. Chuck em to the login page, and it'll automagically update it without them needing to enter their credentials again, it'll throw them back here and this code will run again (and hopefully not loop them into oblivion #nocookiesusersffs)
+        }
       });
   }
 });
@@ -208,10 +222,14 @@ app.get('/admin', (req, res) => { // /admin page
 
   admin.auth().verifyIdToken(idToken) // So they provided an ID token, but is it a real ID token?
     .then(function (decodedToken) { // Yes, it's a real token!
-      // let uid = decodedToken.uid;
-      res.render('admin', {
-        idToken: req.cookies['sessionid']
-      }); // They're genuine, let them through the floodgates.
+      var susIDToken = isSus(decodedToken.uid)
+      if(!susIDToken) {
+        res.render('admin', {
+          idToken: req.cookies['sessionid']
+        }); // They're genuine, let them through the floodgates.
+      } else if(susIDToken) {
+        res.redirect('login');
+      }
     }).catch(function (error) { // IMPOSTOR! IMPOSTOR! AMOGUS SUS
       // Check if their ID token actually just expired...
       if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
@@ -273,6 +291,16 @@ function connectionStatus() { // Connection status thingy because I like being t
 //});
 //}
 
-function setVariable(x) {
-  return x;
+function isSus(uid) {
+  const db = admin.database(); // Define the database
+  const ref = db.ref('/users/aquinas/' + uid + '/name'); // Database reference
+  console.log('/users/aquinas/' + uid + '/name');
+
+  ref.once('value', (snapshot) => { // Grab the data from the reference above
+    if(snapshot.val() != null) { // If the user's name exists (meaning if there's actually a user properly registered with this idea)
+      return false; // They aren't sus
+    }
+  }, (errorObject) => { // Error... beep boop
+    return true; // They are very sus!
+  });
 }
