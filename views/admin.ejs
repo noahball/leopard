@@ -25,9 +25,13 @@
                 <input type="text" class="form-control" id="bus" name="bus" placeholder="Enter a bus">
             </div>
             <div class="mb-3 container-form">
-                <input type="text" class="form-control" id="journey" name="journey" placeholder="Enter a journey (AM or PM)">
+                <input type="text" class="form-control" id="journey" name="journey"
+                    placeholder="Enter a journey (AM or PM)">
             </div>
-    
+
+            <!-- Values for POST -->
+            <input type="text" style="display: none !important;" name="idToken" value="<%= idToken %>">
+
             <div class="center">
                 <button type="submit" class="btn btn-primary btn-lg">Submit</button>
             </div>

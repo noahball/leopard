@@ -109,59 +109,77 @@ app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
 });
 
 app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing lists of students who checked in at a specific bus/time)
-  if (!req.body.bus || !req.body.date || !req.body.journey) { // If not all fields are filled
+  if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.idToken) { // If not all fields are filled
     res.redirect('/admin' + '?result=incomplete'); // Redirect to admin page and throw an incomplete message
-  } else { // Else if all fields are filled
-    // Swap from American date format to Aotearoa date format
-    var dateString = req.body.date; // Grab the date from the date field
-    dateString = dateString.substr(8, 2) + "-" + dateString.substr(5, 2) + "-" + dateString.substr(0, 4); // HTML date fields display the date differently to us, so we'll rearrange it to suit the way we format the date (which is DD-MM-YYYY)
-    // Grab positions 8 and 9 from req.body.date (DD)
-    // Grab positions 5 and 6 from req.body.date (MM)
-    // Grab positions 0, 1, 2, 3 and 4 from req.body.date (YYYY)
-    // All of this is merged together into our DD-MM-YY format.
+  } else {
+    var idToken = req.body.idToken;
+    admin.auth().verifyIdToken(idToken) // So they provided an ID token, but is it a real ID token?
+      .then(function (decodedToken) { // Yes, it's a real token!
+        // They're genuine, let them through the floodgates.
 
-    var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
-    var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
-    const db = admin.database(); // Define DB
-    const ref = db.ref('/check-in'); // Database reference
+        // Else if all fields are filled
+        // Swap from American date format to Aotearoa date format
+        var dateString = req.body.date; // Grab the date from the date field
+        dateString = dateString.substr(8, 2) + "-" + dateString.substr(5, 2) + "-" + dateString.substr(0, 4); // HTML date fields display the date differently to us, so we'll rearrange it to suit the way we format the date (which is DD-MM-YYYY)
+        // Grab positions 8 and 9 from req.body.date (DD)
+        // Grab positions 5 and 6 from req.body.date (MM)
+        // Grab positions 0, 1, 2, 3 and 4 from req.body.date (YYYY)
+        // All of this is merged together into our DD-MM-YY format.
 
-    const schoolRef = ref.child('aquinas/' + dateString + '/' + busFormatted + '/' + journeyFormatted); // Expand on the database reference to the location we want to read data from
+        var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
+        var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
+        const db = admin.database(); // Define DB
+        const ref = db.ref('/check-in'); // Database reference
 
-    schoolRef.once('value', (data) => { // Read the data
-      try { // Try this
-        var studentsArray = data.val().students; // Grab the students' names for the bus/time in question. This is retrieved as an array from Firebase
-        var tutorsArray = data.val().studentsTutor; // Grab the students' tutor classes for the bus/time in question. This is retrieved as an array from Firebase
+        const schoolRef = ref.child('aquinas/' + dateString + '/' + busFormatted + '/' + journeyFormatted); // Expand on the database reference to the location we want to read data from
 
-        var timeOfDay = (journeyFormatted == "PM") ? "afternoon" : "morning"; // If after 12pm, it's afternoon, else it's morning
+        schoolRef.once('value', (data) => { // Read the data
+          try { // Try this
+            var studentsArray = data.val().students; // Grab the students' names for the bus/time in question. This is retrieved as an array from Firebase
+            var tutorsArray = data.val().studentsTutor; // Grab the students' tutor classes for the bus/time in question. This is retrieved as an array from Firebase
 
-        res.render('results', { // Render the results page
-          busNumber: busFormatted, // Bus number looked up
-          date: dateString, // Date looked up
-          timeOfDay: timeOfDay, // Journey time in morning/afternoon format
-          students: studentsArray, // Students array
-          tutors: tutorsArray, // Tutor classes array
-          resultsFound: true // Yes, we found results
-        });
-      } catch (err) { // An error is normally encountered when trying to grab the students array above when there aren't any check-ins for the specified params!
-        try {
-          // Trying to narrow down the error here. Don't want to return a 'no results' message if a different error was encountered. A null value always crashes node... so I can't just simply check for it :/
-          var studentsArray = data.val().students;
+            var timeOfDay = (journeyFormatted == "PM") ? "afternoon" : "morning"; // If after 12pm, it's afternoon, else it's morning
+
+            res.render('results', { // Render the results page
+              busNumber: busFormatted, // Bus number looked up
+              date: dateString, // Date looked up
+              timeOfDay: timeOfDay, // Journey time in morning/afternoon format
+              students: studentsArray, // Students array
+              tutors: tutorsArray, // Tutor classes array
+              resultsFound: true // Yes, we found results
+            });
+          } catch (err) { // An error is normally encountered when trying to grab the students array above when there aren't any check-ins for the specified params!
+            try {
+              // Trying to narrow down the error here. Don't want to return a 'no results' message if a different error was encountered. A null value always crashes node... so I can't just simply check for it :/
+              var studentsArray = data.val().students;
+              res.render('splash', { // Render the splash screen...
+                body: 'Something went wrong. Debug information for nerds:<br>' + err // ...but set the text differently
+              }); // This response will only run if there's an error with running the line before, meaning that the students value was successfully recieved from Firebase, but something else is amiss.
+              console.log('An unexpected error was encountered: ' + err); // Log it, because something really went to custard!
+            } catch (err) { // There was an error in the try statement - normally this is that execution stopped because data.val().students is empty (there is no data for the params entered!). Assume this, and throw a no results found screen.
+              res.render('results', { // Render the results page
+                resultsFound: false // No, we didn't find any results matching the criteria provided
+              });
+            }
+          }
+        }, (errorObject) => { // Error encountered related to Firebase
           res.render('splash', { // Render the splash screen...
-            body: 'Something went wrong. Debug information for nerds:<br>' + err // ...but set the text differently
-          }); // This response will only run if there's an error with running the line before, meaning that the students value was successfully recieved from Firebase, but something else is amiss.
-          console.log('An unexpected error was encountered: ' + err); // Log it, because something really went to custard!
-        } catch (err) { // There was an error in the try statement - normally this is that execution stopped because data.val().students is empty (there is no data for the params entered!). Assume this, and throw a no results found screen.
-          res.render('results', { // Render the results page
-            resultsFound: false // No, we didn't find any results matching the criteria provided
+            body: 'Something went wrong. Debug information for nerds:<br>' + errorObject.name // ...but set the text differently
+          }); // Tell the user the nerdy debug info so I look cool (yikes!)
+          console.log('An unexpected error was encountered: ' + errorObject.name); // Log it, because something really went to custard!
+        });
+      }).catch(function (error) { // IMPOSTOR! IMPOSTOR! AMOGUS SUS
+        // Check if their ID token actually just expired...
+        if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
+
+          // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
+          res.render('splash', {
+            body: 'Something went wrong. Debug information for nerds:<br>' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
           });
+        } else {
+          res.redirect('/login'); // Else, their ID token has expired. Chuck em to the login page, and it'll automagically update it without them needing to enter their credentials again, it'll throw them back here and this code will run again (and hopefully not loop them into oblivion #nocookiesusersffs)
         }
-      }
-    }, (errorObject) => { // Error encountered related to Firebase
-      res.render('splash', { // Render the splash screen...
-        body: 'Something went wrong. Debug information for nerds:<br>' + errorObject.name // ...but set the text differently
-      }); // Tell the user the nerdy debug info so I look cool (yikes!)
-      console.log('An unexpected error was encountered: ' + errorObject.name); // Log it, because something really went to custard!
-    });
+      });
   }
 });
 
@@ -178,7 +196,9 @@ app.get('/admin', (req, res) => { // /admin page
   admin.auth().verifyIdToken(idToken) // So they provided an ID token, but is it a real ID token?
     .then(function (decodedToken) { // Yes, it's a real token!
       // let uid = decodedToken.uid;
-      res.render('admin'); // They're genuine, let them through the floodgates.
+      res.render('admin', {
+        idToken: req.cookies['sessionid']
+      }); // They're genuine, let them through the floodgates.
     }).catch(function (error) { // IMPOSTOR! IMPOSTOR! AMOGUS SUS
       // Check if their ID token actually just expired...
       if (error != "Error: Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.") {
