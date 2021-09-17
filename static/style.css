@@ -69,3 +69,15 @@ h5 {
 .center {
     text-align: center;
 }
+
+.table-dark {
+    --bs-table-bg: #005A4E !important;
+    --bs-table-striped-bg: #FFFFFF !important;
+    --bs-table-striped-color: #FFFFFF !important;
+    --bs-table-active-bg: #005A4E !important;
+    --bs-table-active-color: #FFFFFF !important;
+    --bs-table-hover-bg: #323539 !important;
+    --bs-table-hover-color: #005A4E !important;
+    color: #FFFFFF !important;
+    border-color: #005A4E !important;
+}

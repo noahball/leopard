@@ -19,11 +19,22 @@
     <div class="privacy-container">
         <% if(resultsFound == true) { %>
         <h3>Students who took Bus #<%= busNumber %> in the <%= timeOfDay %> on <%= date %></h3>
-        <ul>
-            <% for (var i = 0; i < students.length; i++) { %>
-            <li><%= students[i] %> - <%= tutors[i] %></li>
-            <% } %>
-        </ul>
+        <table class="table table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Full Name</th>
+                <th scope="col">Tutor Class</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% for (var i = 0; i < students.length; i++) { %>
+              <tr>
+                <td><%= students[i] %></td>
+                <td><%= tutors[i] %></td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
         <% } else { %>
         <h3>No results found.</h3>
         <% } %>
