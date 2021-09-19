@@ -212,8 +212,6 @@ Project Link: [https://github.com/noahball/leopard](https://github.com/noahball/
 ## Acknowledgements
 
 * [OpenJS Foundation](https://openjsf.org/)
-* []()
-* []()
 
 
 
