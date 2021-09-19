@@ -13,6 +13,8 @@
         integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 
     <link rel="stylesheet" href="/static/style.css">
+
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdgE3gcAAAAALUrNtIDjXkZlOfVNyZzr2tjlIZL"></script>
 </head>
 
 <body>
@@ -20,7 +22,7 @@
     <h1 class="welcome">Good <%= timeOfDay %>,</h1>
     <h5>For contact tracing purposes, all students who take buses must check in.</h5>
 
-    <form class="checkin-container" method="POST" action="/api/v1/check-in">
+    <form id="checkin" class="checkin-container" method="POST" action="/api/v1/check-in">
         <h3 class="bus-info"><%= currentDay %> <%= date %> (<%= ampm %>) - Bus <%= busNumber %></h3>
         <div class="mb-3 container-form">
             <input type="text" class="form-control" id="name" name="name" placeholder="Full Name">
@@ -33,6 +35,7 @@
         <input type="text" style="display: none !important;" name="bus" value="<%= busNumber %>">
         <input type="text" style="display: none !important;" name="date" value="<%= date %>">
         <input type="text" style="display: none !important;" name="journey" value="<%= ampm %>">
+        <input id="recaptchaResponse" type="text" style="display: none !important;" name="recaptchaResponse" value="fail">
 
         <button type="submit" class="btn btn-primary btn-lg">Submit</button>
     </form>

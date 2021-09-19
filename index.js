@@ -5,6 +5,7 @@ const express = require('express') // Import express.js (the web server used for
 let ejs = require('ejs'); // Import EJS (dynamic page generator)
 var bodyParser = require('body-parser'); // Parser
 const cookieParser = require("cookie-parser"); // Parser
+const axios = require('axios'); // Outgoing HTTP requests
 const app = express() // Define Express
 const port = 3000 // Port for Leopard's web server to run on
 
@@ -77,37 +78,60 @@ app.get('/privacy', (req, res) => { // Rendering the privacy page (no need for v
 });
 
 app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
-  if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class) { // If any of the submitted fields are empty
+  if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class || !req.body.recaptchaResponse) { // If any of the submitted fields are empty
     res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=incomplete'); // Return them to the check-in page and throw a "incomplete" message
   } else { // If all fields contain data
-    const db = admin.database(); // Define the DB
-    const ref = db.ref('/check-in'); // Define the reference to use
 
-    var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
-    var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
+    // reCAPTCHA Verification
+    const captchaURL = `https://www.google.com/recaptcha/api/siteverify`
+    // Get the token from the form
+    const key = req.body['recaptchaResponse'];
+    const recpatchaSecret = '6LdgE3gcAAAAAPtTuas3jdIKxlbl1YBNtIQ5ehVs';
 
-    const schoolArraysRef = ref.child('aquinas/' + req.body.date + '/' + busFormatted + '/' + journeyFormatted); // Extend on the reference to get the location that data will be stored
-    schoolArraysRef.once("value", function (data) { // Read data from the reference above
+    axios({
+      url: captchaURL + `?secret=` + recpatchaSecret + `&response=` + key,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+    }).then((captchaRes) => {
+      const data = captchaRes.data
+      if (!data.success === true || !data.score > 0.5) {
+        res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=recaptcha-failed');
+      } else {
+        // If all fields contain data
+        const db = admin.database(); // Define the DB
+        const ref = db.ref('/check-in'); // Define the reference to use
 
-      try {
-        var currentID = data.val().currentID; // Attempts trying to find the current array ID
-      } catch (err) { // This block runs if an error is thrown above - which is usually because the array ID hasn't been set - meaning this is probably a first check-in for this bus ride/time
-        schoolArraysRef.update({ // Create the currentID object. Using .update instead of .set, else all data at schoolArraysRef would be overwritten - even if we don't set it here!
-          currentID: 0
+        var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
+        var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
+
+        const schoolArraysRef = ref.child('aquinas/' + req.body.date + '/' + busFormatted + '/' + journeyFormatted); // Extend on the reference to get the location that data will be stored
+        schoolArraysRef.once("value", function (data) { // Read data from the reference above
+
+          try {
+            var currentID = data.val().currentID; // Attempts trying to find the current array ID
+          } catch (err) { // This block runs if an error is thrown above - which is usually because the array ID hasn't been set - meaning this is probably a first check-in for this bus ride/time
+            schoolArraysRef.update({ // Create the currentID object. Using .update instead of .set, else all data at schoolArraysRef would be overwritten - even if we don't set it here!
+              currentID: 0
+            });
+            var currentID = 0; // Grabbing the current ID from data.val() would crash the program here. I assume this is because currentID did not exist when we grabbed data from schoolArraysRef. The data inside the schoolArraysRef.once function doesn't update because we're using .once - only grab the data once. We could use .on and grab the data from data.val(), however that would create an event listener and cause many new complications (including endlessly looping and spamming the RTDB until a stack overload), so we'll just manually set this variable to zero - since that's the only value it'd need to be set to under a normal scenario that this code block is run.
+          }
+
+          var newID = currentID + 1; // Get the value for the new "currentID" - for when this code block is run when we need to add more check-ins
+          schoolArraysRef.update({
+            [`students/` + currentID]: req.body.name, // Update schoolArraysRef/students/num with the name of the student.
+            [`studentsTutor/` + currentID]: req.body.class, // Update schoolArraysRef/studentsTutor/num with the student's tutor class.
+            currentID: newID // Update the currentID
+          });
         });
-        var currentID = 0; // Grabbing the current ID from data.val() would crash the program here. I assume this is because currentID did not exist when we grabbed data from schoolArraysRef. The data inside the schoolArraysRef.once function doesn't update because we're using .once - only grab the data once. We could use .on and grab the data from data.val(), however that would create an event listener and cause many new complications (including endlessly looping and spamming the RTDB until a stack overload), so we'll just manually set this variable to zero - since that's the only value it'd need to be set to under a normal scenario that this code block is run.
+
+        res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success'); // If we get to here, everything worked nicely! Return the user back from the API endpoint to the check-in page with a success message.
       }
-
-      var newID = currentID + 1; // Get the value for the new "currentID" - for when this code block is run when we need to add more check-ins
-      schoolArraysRef.update({
-        [`students/` + currentID]: req.body.name, // Update schoolArraysRef/students/num with the name of the student.
-        [`studentsTutor/` + currentID]: req.body.class, // Update schoolArraysRef/studentsTutor/num with the student's tutor class.
-        currentID: newID // Update the currentID
-      });
-    });
-
-    res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success'); // If we get to here, everything worked nicely! Return the user back from the API endpoint to the check-in page with a success message.
-
+    }).catch((error) => {
+      console.log('reCAPTCHA - HTTP POST Error: ' + error)
+      res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=error&error=' + error);
+    })
   }
 });
 
@@ -118,7 +142,7 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
     var idToken = req.body.idToken;
     admin.auth().verifyIdToken(idToken) // So they provided an ID token, but is it a real ID token?
       .then(function (decodedToken) { // Yes, it's a real token!
-        
+
         // They're genuine, let them through the floodgates.
 
         const db = admin.database(); // Define the database
@@ -126,7 +150,7 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
 
         requestedRef.once('value', (snapshot) => { // Grab the data from the reference above
           var requestedByVar = snapshot.val();
-          if(requestedByVar == null) { // Isn't an actual valid id token. Sneaky impostor!
+          if (requestedByVar == null) { // Isn't an actual valid id token. Sneaky impostor!
             res.redirect('/login');
             return
           }
@@ -227,11 +251,11 @@ app.get('/admin', (req, res) => { // /admin page
   admin.auth().verifyIdToken(idToken) // So they provided an ID token, but is it a real ID token?
     .then(function (decodedToken) { // Yes, it's a real token!
       var susIDToken = isSus(decodedToken.uid)
-      if(!susIDToken) {
+      if (!susIDToken) {
         res.render('admin', {
           idToken: req.cookies['sessionid']
         }); // They're genuine, let them through the floodgates.
-      } else if(susIDToken) {
+      } else if (susIDToken) {
         res.redirect('login');
       }
     }).catch(function (error) { // IMPOSTOR! IMPOSTOR! AMOGUS SUS
@@ -300,10 +324,36 @@ function isSus(uid) {
   const ref = db.ref('/users/aquinas/' + uid + '/name'); // Database reference
 
   ref.once('value', (snapshot) => { // Grab the data from the reference above
-    if(snapshot.val() != null) { // If the user's name exists (meaning if there's actually a user properly registered with this idea)
+    if (snapshot.val() != null) { // If the user's name exists (meaning if there's actually a user properly registered with this idea)
       return false; // They aren't sus
     }
   }, (errorObject) => { // Error... beep boop
     return true; // They are very sus!
   });
+}
+
+function recaptchaResponse(req, res, next) {
+  const captchaURL = `https://www.google.com/recaptcha/api/siteverify`
+  // Get the token from the form
+  const key = req.body['recaptchaResponse'];
+  const secret = '6LdgE3gcAAAAAPtTuas3jdIKxlbl1YBNtIQ5ehVs';
+
+  axios({
+    url: captchaURL,
+    method: 'POST',
+    headers: {
+      ContentType: 'application/x-www-form-urlencoded'
+    },
+    body: `secret=${SECRET}&response=${req.body['g-recaptcha-response']}`,
+  }).then((captchaRes) => {
+    const data = captchaRes.data
+
+    if (data.success === true && data.score > 0.5) {
+      console.log('hooman')
+    } else {
+      console.log('beep boop')
+    }
+  }).catch((error) => {
+    next(error)
+  })
 }
