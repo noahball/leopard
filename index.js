@@ -298,7 +298,6 @@ function connectionStatus() { // Connection status thingy because I like being t
 function isSus(uid) {
   const db = admin.database(); // Define the database
   const ref = db.ref('/users/aquinas/' + uid + '/name'); // Database reference
-  console.log('/users/aquinas/' + uid + '/name');
 
   ref.once('value', (snapshot) => { // Grab the data from the reference above
     if(snapshot.val() != null) { // If the user's name exists (meaning if there's actually a user properly registered with this idea)
