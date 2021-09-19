@@ -357,3 +357,8 @@ function recaptchaResponse(req, res, next) {
     next(error)
   })
 }
+
+// Notes:
+// Example school assets:
+// #333366
+// https://lh3.googleusercontent.com/proxy/2LsKu3idlH_dfgQizqLgyQ4hHzP1gHz76KQOX8u711rIUp0-kUk7jqXTm3yy4rT9SpJygkBasb8glE2wPZW35DXln888gIW8D2vhKOmUN0A7
