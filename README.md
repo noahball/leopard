@@ -20,10 +20,11 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
+  [![License][license-shield]][license-url]
+  [![Last Commit][last-commit-shield]][last-commit-url]
+  [![Contributors][contributors-shield]][contributors-url]
+  [![Forks][forks-shield]][forks-url]
+  [![Stargazers][stars-shield]][stars-url]
 
 
 
@@ -220,15 +221,13 @@ Project Link: [https://github.com/noahball/leopard](https://github.com/noahball/
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/noahball/repo.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/noahball/leopard?style=for-the-badge
 [contributors-url]: https://github.com/noahball/leopard/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/noahball/repo.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/noahball/leopard?style=for-the-badge
 [forks-url]: https://github.com/noahball/leopard/network/members
-[stars-shield]: https://img.shields.io/github/stars/noahball/repo.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/noahball/leopard?style=for-the-badge
 [stars-url]: https://github.com/noahball/leopard/stargazers
-[issues-shield]: https://img.shields.io/github/issues/noahball/repo.svg?style=for-the-badge
-[issues-url]: https://github.com/noahball/leopard/issues
-[license-shield]: https://img.shields.io/github/license/noahball/repo.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/noahball/leopard?style=for-the-badge
 [license-url]: https://github.com/noahball/leopard/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/noahball
+[last-commit-shield]: https://img.shields.io/github/last-commit/noahball/leopard?style=for-the-badge
+[last-commit-url]: https://github.com/noahball/leopard/commits
