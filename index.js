@@ -360,6 +360,20 @@ app.get('/admin', (req, res) => { // /admin page
     });
 });
 
+// 404 Handler
+app.use(function (req, res, next) {
+  res.render('splash', {
+    error: true,
+    schoolName: config.school,
+    schoolFullName: config.schoolFull,
+    schoolLogo: config.schoolLogo,
+    schoolColour: config.schoolColour,
+    schoolTextColour: config.schoolTextColour,
+    recaptchaSite: config.recaptchaSite,
+    body: '404. The page that you\'re looking for doesn\'t exist.' // Tell the sussy baka an error in case my code funked up
+  });
+})
+
 app.listen(port, () => { // Start Express
   console.log(`Leopard is running at http://localhost:${port}`); // Log the URL/Port (URL doesn't actually matter for accessing the pages themselves, however domain access is whitelisted for access to services like Firebase Authentication on the admin page)
 })
