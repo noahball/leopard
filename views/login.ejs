@@ -20,9 +20,15 @@
 
     <div id="user_div" class="loggedin-div">
         <h1><%= schoolFullName %></h1>
-        <p id="user_para">Loading...</p>
+        <p id="user_para">Working...</p>
+        <button id="dashboard-button" onclick="window.location = '/admin'">Admin Dashboard</button>
+        <br>
         <button id="logout-button" onclick="logout()">Logout</button>
     </div>
+
+    <!-- Environment Values -->
+    <input id="schoolName" type="text" style="display: none !important;" value="<%= schoolName %>">
+    <input id="schoolFullName" type="text" style="display: none !important;" value="<%= schoolFullName %>">
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.18.0/firebase-app.js"></script>

@@ -97,17 +97,19 @@ function logout() {
 
 function getUserInfo() {
   var school = document.getElementById('schoolName').value;
+  var schoolFull = document.getElementById('schoolFullName').value;
   var currentUser = firebase.auth().currentUser;
   var uid = currentUser.uid;
+  console.log(`/users/` + school + `/` + uid);
   return firebase.database().ref(`/users/` + school + `/` + uid).once('value').then(function (snapshot) {
     // YES THIS IS TECHNICALLY FAKE LOADING... however if this wasn't implemented you would see a brief corrupt message while the app is connecting to Firebase.
     setTimeout(() => {
       if (!snapshot.exists()) {
-        document.getElementById("user_para").innerHTML = "OH NO! It appears your account is corrupt. Please contact Leopard support for further assistance.";
+        document.getElementById("user_para").innerHTML = "Your account is not authorised to login to " + schoolFull + "'s Leopard Dashboard.";
       } else {
         var userName = snapshot.val().name;
         var role = snapshot.val().role;
-        document.getElementById("user_para").innerHTML = "Kia ora, " + userName + "<br>Permissions: " + role;
+        document.getElementById("user_para").innerHTML = "Hiya, " + userName + "<br>You are an " + role + ".";
       }
     }, 1200);
   });
