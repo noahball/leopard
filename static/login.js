@@ -30,10 +30,9 @@ function writeUserData() {
     var errorMessage = error.message;
 
     Swal.fire({
-      title: 'And I oop!',
-      text: 'An error occured. ' + errorMessage + ' Or just give up and save the turtles instead. Up to you!',
+      title: 'Something\'s up',
+      text: 'An error occured. ' + errorMessage,
       icon: 'error',
-      confirmButtonText: 'sksksksk'
     })
   });
 }
@@ -81,10 +80,9 @@ function login() {
     var errorMessage = error.message;
 
     Swal.fire({
-      title: 'And I oop!',
-      text: 'An error occured. ' + errorMessage + ' Or just give up and save the turtles instead. Up to you!',
+      title: 'Something\'s up',
+      text: 'An error occured. ' + errorMessage,
       icon: 'error',
-      confirmButtonText: 'sksksksk'
     })
   });
 
@@ -129,10 +127,9 @@ function signUp() {
     var errorMessage = error.message;
 
     Swal.fire({
-      title: 'And I oop!',
-      text: 'An error occured. ' + errorMessage + ' Or just give up and save the turtles instead. Up to you!',
+      title: 'Something\'s up',
+      text: 'An error occured. ' + errorMessage,
       icon: 'error',
-      confirmButtonText: 'sksksksk'
     })
 
   });
