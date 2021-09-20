@@ -1,7 +1,7 @@
 {
-    "school" : "aquinas",
-    "schoolFull" : "Aquinas College",
-    "schoolLogo" : "https://i0.wp.com/www.aquinas.school.nz/wp-content/uploads/2016/09/logo.png",
+    "school" : "examplehigh",
+    "schoolFull" : "Example City High School",
+    "schoolLogo" : "https://i.imgur.com/f34zXHR.png",
     "schoolColour" : "#333366",
     "schoolTextColour" : "#FFFFFF",
     "databaseURL" : "https://leopard-data-default-rtdb.asia-southeast1.firebasedatabase.app",

@@ -9,7 +9,7 @@ function writeUserData() {
     var currentUser = firebase.auth().currentUser;
     var uid = currentUser.uid;
 
-    var school = "aquinas";
+    var school = document.getElementById('schoolName').value;
     firebase.database().ref('/users/' + school + '/' + uid).set({
       name: userName,
       email: userEmail,
@@ -50,7 +50,7 @@ firebase.auth().onAuthStateChanged(function (user) {
     firebase.auth().currentUser.getIdToken( /* forceRefresh */ true).then(function (idToken) {
       console.log(idToken);
       document.cookie = `sessionid=` + idToken + `; expires=Sat, 20 Apr 2069 12:00:00 UTC; path=/`;
-      window.location = "/admin";
+      // window.location = "/admin";
     }).catch(function (error) {
       console.log(`ID Token failure.\n\nDEBUG INFORMATION FOR NERDS:\n\n` + error);
     });
@@ -96,7 +96,7 @@ function logout() {
 }
 
 function getUserInfo() {
-  var school = "aquinas";
+  var school = document.getElementById('schoolName').value;
   var currentUser = firebase.auth().currentUser;
   var uid = currentUser.uid;
   return firebase.database().ref(`/users/` + school + `/` + uid).once('value').then(function (snapshot) {
@@ -151,4 +151,9 @@ function loginAfterSignUp() {
 
   writeUserData();
 
+}
+
+const queryString = window.location.search;
+if (queryString == '?action=logout') {
+  logout();
 }

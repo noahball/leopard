@@ -8,7 +8,7 @@
 
 <body>
     <div id="login_div" class="main-div">
-        <h1>Leopard</h1>
+        <h1><%= schoolFullName %></h1>
         <input type="email" placeholder="Email" id="email_field" />
         <input type="password" placeholder="Password" id="password_field" />
 
@@ -19,7 +19,7 @@
     </div>
 
     <div id="user_div" class="loggedin-div">
-        <h1>Leopard</h1>
+        <h1><%= schoolFullName %></h1>
         <p id="user_para">Loading...</p>
         <button id="logout-button" onclick="logout()">Logout</button>
     </div>

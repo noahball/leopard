@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin | Leopard</title>
+    <title>Admin | <%= schoolFullName %></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <img class="school-logo" src="https://i0.wp.com/www.aquinas.school.nz/wp-content/uploads/2016/09/logo.png">
+    <img class="school-logo" src="<%= schoolLogo %>">
     <h1 class="welcome">Admin Area</h1>
 
     <div class="privacy-container">
@@ -37,6 +37,12 @@
             </div>
         </form>
     </div>
+
+    <!-- Environment Values -->
+    <input id="schoolColour" type="text" style="display: none !important;" value="<%= schoolColour %>">
+    <input id="schoolTextColour" type="text" style="display: none !important;" value="<%= schoolTextColour %>">
+    <input id="recaptchaSite" type="text" style="display: none !important;" value="<%= recaptchaSite %>">
+
     <p><br>Powered by Leopard, a check-in system for students by Noah Ball.<br><a href="/privacy">Privacy Policy</a> |
         <a href="/source">Source Code</a></p>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"

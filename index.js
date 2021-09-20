@@ -67,9 +67,12 @@ app.get('/check-in/:school/:bus', (req, res) => { // Check-in page
       date: getDate(), // Current date (grabbed from function at the bottom of this file)
       ampm: ampm, // Is it AM or PM right now?
       timeOfDay: timeOfDay, // Is it the morning or afternoon?
-      recaptchaSite: config.recaptchaSite,
+      schoolName: config.school,
+      schoolFullName: config.schoolFull,
+      schoolLogo: config.schoolLogo,
       schoolColour: config.schoolColour,
-      schoolTextColour: config.schoolTextColour
+      schoolTextColour: config.schoolTextColour,
+      recaptchaSite: config.recaptchaSite
     });
   } else { // If the school in the URL is not the school that Leopard is being used at
     res.render('splash', { // Render the splash screen...
@@ -79,7 +82,14 @@ app.get('/check-in/:school/:bus', (req, res) => { // Check-in page
 });
 
 app.get('/privacy', (req, res) => { // Rendering the privacy page (no need for variables as it's static) 
-  res.render('privacy');
+  res.render('privacy', {
+    schoolName: config.school,
+    schoolFullName: config.schoolFull,
+    schoolLogo: config.schoolLogo,
+    schoolColour: config.schoolColour,
+    schoolTextColour: config.schoolTextColour,
+    recaptchaSite: config.recaptchaSite
+  });
 });
 
 app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
@@ -91,7 +101,7 @@ app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
     const captchaURL = `https://www.google.com/recaptcha/api/siteverify`
     // Get the token from the form
     const key = req.body['recaptchaResponse'];
-    const recpatchaSecret = config.recpatchaSecret;
+    const recpatchaSecret = config.recaptchaSecret;
 
     axios({
       url: captchaURL + `?secret=` + recpatchaSecret + `&response=` + key,
@@ -100,7 +110,8 @@ app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
         'Content-Type': 'application/x-www-form-urlencoded'
       },
     }).then((captchaRes) => {
-      const data = captchaRes.data
+      const data = captchaRes.data;
+      console.log(captchaRes.data);
       if (!data.success === true || !data.score > 0.5) {
         res.redirect('/check-in/' + config.school + '/' + req.body.bus + '?signed-in=recaptcha-failed');
       } else {
@@ -188,7 +199,13 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
                 students: studentsArray, // Students array
                 tutors: tutorsArray, // Tutor classes array
                 resultsFound: true, // Yes, we found results
-                requestedBy: requestedByVar // Who requested these results
+                requestedBy: requestedByVar, // Who requested these results
+                schoolName: config.school,
+                schoolFullName: config.schoolFull,
+                schoolLogo: config.schoolLogo,
+                schoolColour: config.schoolColour,
+                schoolTextColour: config.schoolTextColour,
+                recaptchaSite: config.recaptchaSite
               });
             } catch (err) { // An error is normally encountered when trying to grab the students array above when there aren't any check-ins for the specified params!
               try {
@@ -200,7 +217,13 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
                 console.log('An unexpected error was encountered: ' + err); // Log it, because something really went to custard!
               } catch (err) { // There was an error in the try statement - normally this is that execution stopped because data.val().students is empty (there is no data for the params entered!). Assume this, and throw a no results found screen.
                 res.render('results', { // Render the results page
-                  resultsFound: false // No, we didn't find any results matching the criteria provided
+                  resultsFound: false, // No, we didn't find any results matching the criteria provided
+                  schoolName: config.school,
+                  schoolFullName: config.schoolFull,
+                  schoolLogo: config.schoolLogo,
+                  schoolColour: config.schoolColour,
+                  schoolTextColour: config.schoolTextColour,
+                  recaptchaSite: config.recaptchaSite
                 });
               }
             }
@@ -240,11 +263,17 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
 });
 
 app.get('/login', (req, res) => {
-  res.render('login'); // Render the static /login page (authentication is handled through client side JS - it's just easier - see /static/login.js)
+  res.render('login', {
+    schoolName: config.school,
+    schoolFullName: config.schoolFull
+  }); // Render the static /login page (authentication is handled through client side JS - it's just easier - see /static/login.js)
 });
 
 app.get('/signup', (req, res) => {
-  res.render('signup'); // Render the static /signup page (authentication is handled through client side JS - it's just easier - see /static/login.js)
+  res.render('signup', {
+    schoolName: config.school,
+    schoolFullName: config.schoolFull
+  }); // Render the static /signup page (authentication is handled through client side JS - it's just easier - see /static/login.js)
 });
 
 app.get('/admin', (req, res) => { // /admin page
@@ -258,7 +287,13 @@ app.get('/admin', (req, res) => { // /admin page
       var susIDToken = isSus(decodedToken.uid)
       if (!susIDToken) {
         res.render('admin', {
-          idToken: req.cookies['sessionid']
+          idToken: req.cookies['sessionid'],
+          schoolName: config.school,
+          schoolFullName: config.schoolFull,
+          schoolLogo: config.schoolLogo,
+          schoolColour: config.schoolColour,
+          schoolTextColour: config.schoolTextColour,
+          recaptchaSite: config.recaptchaSite
         }); // They're genuine, let them through the floodgates.
       } else if (susIDToken) {
         res.redirect('login');
