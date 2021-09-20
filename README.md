@@ -110,13 +110,30 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-Leopard is not designed to be run with just a few commands and a config file. **You will need knowledge of Node.js, basic web technologies and Firebase to create your own instance.** Feel free to reach out to me if you need help.
+Leopard is now easier to setup. Everything that you need to change to setup the application for your school is located in config.json. **You will need knowledge of Node.js, basic web technologies and Firebase to create your own instance.** Feel free to reach out to me if you need help.
 
 1. Firebase RTDB and Authentication
-- You will need to create a Firebase Account, RTDB Database and setup Firebase Authentication, then replace the default database URLs in Leopard's source code.
+- You will need to create a Firebase Account, RTDB Database and setup Firebase Authentication, then replace the database URL and web project config snippet in config.json.
 
 2. reCAPTCHA v3 Keys
-- You will need to create a new reCAPTCHA v3 project, then replace the default client/secret keys in Leopard's source code.
+- You will need to create a new reCAPTCHA v3 project, then add the client/secret keys in config.json.
+
+#### Configuration File
+Leopard can simply be configured with the config.json and firebase.json files. An example of a fully configured installation is provided for you. Here's a brief explanation of what these fields are for. Leopard is not associated with Papamoa College, it is just used here as a real-life example.
+
+- school: An abbreviation of your school's name, like what's in your domain name (eg. papamoacollege)
+- schoolFull: Your school's full name (eg. Papamoa College)
+- schoolLogo: A URL to a jpg, png or gif of your school's logo, ideally there should be a white/transparent background and no borders. Leopard will automagically resize your image (eg. http://www.papamoacollege.school.nz/images/templates/logo.png)
+- schoolColour: Your school's main colour in RGB (eg. #F26322)
+- schoolTextColour: A colour that is easily readable on top of your school's main colour (eg. #FFFFFF)
+- databaseURL: Your Firebase RTDB's URL (eg. https://leopard-data-default-rtdb.asia-southeast1.firebasedatabase.app)
+- serviceAccount: The path to your Firebase service account JSON (eg ./firebase.json)
+- recaptchaSite: Your reCAPTCHA v3 Site Key (eg. 6LdgE3gcAAAAALUrNtIDjXkZlOfVNyZzr2tjlIZL)
+- recaptchaSecret: Your reCAPTCHA v3 Secret Key (eg. 6LdgE3gcAAAAAPtTuas3jdIKxlbl1YBNtIQ5ehVs)
+
+You will also need to download and replace the Firebase Service Account file (firebase.json) with one for your RTDB. You can get this from the Firebase console. 
+
+
 
 ### Installation
 
@@ -137,13 +154,13 @@ Leopard is not designed to be run with just a few commands and a config file. **
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-### Student-side
+#### Student-side
 <img src="https://i.imgur.com/o7rTUfF.jpg" alt="Screenshot" height="300">
 The student-side of Leopard is designed to be accessed by scanning a QR code that directs the user to the relevant check-in screen (eg. http://leopard.local/check-in/school/bus). Each bus will need its own QR code - however new QR codes do not need to be created for each bus ride. The process for creating QR codes is not currently automated - you can just create them by Googling 'QR code generator".
 
 Each student can then enter their name and tutor/form class to check-in. Check-in API endpoints are protected by Google reCAPTCHA v3, preventing students from spamming check-ins, or creating spambots in extreme cases.
 
-## Admin-side
+#### Admin-side
 <img src="https://i.imgur.com/01AsB1s.jpg" alt="Screenshot" height="300">
 <img src="https://i.imgur.com/90fvKKk.jpg" alt="Screenshot" height="300">
 The admin side of Leopard (eg. http://leopard.local/admin) is user friendly and designed to be used by school administrators/office staff. Leopard is designed to be a "set-and-forget" solution, and the admin page only needs to be accessed if a bus student contracts COVID-19. You can register as many admin users as you like by using the sign-up page (eg. http://leopard.local/signup), it is recommended that /views/signup.ejs is deleted when it is not required for security purposes.
@@ -152,7 +169,7 @@ Admin users can lookup bus users by date, bus and journey. These results can onl
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
-## Leopard API
+#### Leopard API
 Leopard's API has not been built for use outside of Leopard's own client (responses are usually returned in full HTML instead of JSON). However, you could extract data from the HTML response if needed.
 
 Current endpoints (API V1):
