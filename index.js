@@ -111,7 +111,6 @@ app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
       },
     }).then((captchaRes) => {
       const data = captchaRes.data;
-      console.log(captchaRes.data);
       if (!data.success === true || !data.score > 0.5) {
         res.redirect('/check-in/' + config.school + '/' + req.body.bus + '?signed-in=recaptcha-failed');
       } else {
@@ -346,19 +345,6 @@ function connectionStatus() { // Connection status thingy because I like being t
   });
 }
 
-//function requestedBy(uid) { // Connection status thingy because I like being technical, okay?
-//const db = admin.database(); // Define the database
-//const ref = db.ref('/users/aquinas/' + uid + `/name`); // Database reference
-
-//ref.once('value', (snapshot) => { // Grab the data from the reference above
-//var personWhoRequested = snapshot.val();
-//return personWhoRequested;
-//}, (errorObject) => {
-//console.log('requestedBy Error: ' + errorObject.name); // Firebase committed bath toaster SCREAM (or maybe /connection just doesn't exist)
-//return "Error"
-//});
-//}
-
 function isSus(uid) {
   const db = admin.database(); // Define the database
   const ref = db.ref('/users/' + config.school + '/' + uid + '/name'); // Database reference
@@ -371,34 +357,3 @@ function isSus(uid) {
     return true; // They are very sus!
   });
 }
-
-function recaptchaResponse(req, res, next) {
-  const captchaURL = `https://www.google.com/recaptcha/api/siteverify`
-  // Get the token from the form
-  const key = req.body['recaptchaResponse'];
-  const secret = config.recpatchaSecret;
-
-  axios({
-    url: captchaURL,
-    method: 'POST',
-    headers: {
-      ContentType: 'application/x-www-form-urlencoded'
-    },
-    body: `secret=${SECRET}&response=${req.body['g-recaptcha-response']}`,
-  }).then((captchaRes) => {
-    const data = captchaRes.data
-
-    if (data.success === true && data.score > 0.5) {
-      console.log('hooman')
-    } else {
-      console.log('beep boop')
-    }
-  }).catch((error) => {
-    next(error)
-  })
-}
-
-// Notes:
-// Example school assets:
-// #333366
-// https://lh3.googleusercontent.com/proxy/2LsKu3idlH_dfgQizqLgyQ4hHzP1gHz76KQOX8u711rIUp0-kUk7jqXTm3yy4rT9SpJygkBasb8glE2wPZW35DXln888gIW8D2vhKOmUN0A7
