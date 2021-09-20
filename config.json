@@ -1,0 +1,11 @@
+{
+    "school" : "aquinas",
+    "schoolFull" : "Aquinas College",
+    "schoolLogo" : "https://i0.wp.com/www.aquinas.school.nz/wp-content/uploads/2016/09/logo.png",
+    "schoolColour" : "#333366",
+    "schoolTextColour" : "#FFFFFF",
+    "databaseURL" : "https://leopard-data-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "serviceAccount" : "./firebase.json",
+    "recaptchaSite" : "6LdgE3gcAAAAALUrNtIDjXkZlOfVNyZzr2tjlIZL",
+    "recaptchaSecret" : "6LdgE3gcAAAAAPtTuas3jdIKxlbl1YBNtIQ5ehVs"
+}

@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/static/style.css">
 
-    <script src="https://www.google.com/recaptcha/api.js?render=6LdgE3gcAAAAALUrNtIDjXkZlOfVNyZzr2tjlIZL"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=<%= recaptchaSite %>"></script>
 </head>
 
 <body>
@@ -36,6 +36,11 @@
         <input type="text" style="display: none !important;" name="date" value="<%= date %>">
         <input type="text" style="display: none !important;" name="journey" value="<%= ampm %>">
         <input id="recaptchaResponse" type="text" style="display: none !important;" name="recaptchaResponse" value="fail">
+
+        <!-- Environment Values -->
+        <input id="recaptchaSite" type="text" style="display: none !important;" value="<%= recaptchaSite %>">
+        <input id="schoolColour" type="text" style="display: none !important;" value="<%= schoolColour %>">
+        <input id="schoolTextColour" type="text" style="display: none !important;" value="<%= schoolTextColour %>">
 
         <button type="submit" class="btn btn-primary btn-lg">Submit</button>
     </form>

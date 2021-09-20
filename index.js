@@ -9,12 +9,14 @@ const axios = require('axios'); // Outgoing HTTP requests
 const app = express() // Define Express
 const port = 3000 // Port for Leopard's web server to run on
 
+var config = require('./config.json'); // Config File
+
 // Firebase
 const admin = require('firebase-admin'); // Firebase package
-const serviceAccount = require("./firebase.json"); // Import Firebase authentication info
+const serviceAccount = require(config.serviceAccount); // Import Firebase authentication info
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://leopard-data-default-rtdb.asia-southeast1.firebasedatabase.app" // URL for RTDB
+  credential: admin.credential.cert(serviceAccount), // Service Account
+  databaseURL: config.databaseURL // URL for RTDB
 });
 var db = admin.database(); // Define RTDB
 
@@ -48,7 +50,7 @@ app.get('/', (req, res) => { // Splash page at /
 });
 
 app.get('/check-in/:school/:bus', (req, res) => { // Check-in page
-  if (req.params.school == 'aquinas') { // If the school in the URL is Aquinas College
+  if (req.params.school == config.school) { // If the school in the URL is the school that Leopard is being used at
 
     var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     var dayName = days[new Date().getDay()]; // Store the current day name in a variable
@@ -64,11 +66,14 @@ app.get('/check-in/:school/:bus', (req, res) => { // Check-in page
       currentDay: dayName, // Current day
       date: getDate(), // Current date (grabbed from function at the bottom of this file)
       ampm: ampm, // Is it AM or PM right now?
-      timeOfDay: timeOfDay // Is it the morning or afternoon?
+      timeOfDay: timeOfDay, // Is it the morning or afternoon?
+      recaptchaSite: config.recaptchaSite,
+      schoolColour: config.schoolColour,
+      schoolTextColour: config.schoolTextColour
     });
-  } else { // If the school in the URL is not Aquinas College
+  } else { // If the school in the URL is not the school that Leopard is being used at
     res.render('splash', { // Render the splash screen...
-      body: req.params.school + ' does not currently use Leopard.' // ...but set the text differently
+      body: req.params.school + ' does not use this Leopard instance.' // ...but set the text differently
     });
   }
 });
@@ -79,14 +84,14 @@ app.get('/privacy', (req, res) => { // Rendering the privacy page (no need for v
 
 app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
   if (!req.body.bus || !req.body.date || !req.body.journey || !req.body.name || !req.body.class || !req.body.recaptchaResponse) { // If any of the submitted fields are empty
-    res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=incomplete'); // Return them to the check-in page and throw a "incomplete" message
+    res.redirect('/check-in/' + config.school + '/' + req.body.bus + '?signed-in=incomplete'); // Return them to the check-in page and throw a "incomplete" message
   } else { // If all fields contain data
 
     // reCAPTCHA Verification
     const captchaURL = `https://www.google.com/recaptcha/api/siteverify`
     // Get the token from the form
     const key = req.body['recaptchaResponse'];
-    const recpatchaSecret = '6LdgE3gcAAAAAPtTuas3jdIKxlbl1YBNtIQ5ehVs';
+    const recpatchaSecret = config.recpatchaSecret;
 
     axios({
       url: captchaURL + `?secret=` + recpatchaSecret + `&response=` + key,
@@ -97,7 +102,7 @@ app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
     }).then((captchaRes) => {
       const data = captchaRes.data
       if (!data.success === true || !data.score > 0.5) {
-        res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=recaptcha-failed');
+        res.redirect('/check-in/' + config.school + '/' + req.body.bus + '?signed-in=recaptcha-failed');
       } else {
         // If all fields contain data
         const db = admin.database(); // Define the DB
@@ -106,7 +111,7 @@ app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
         var busFormatted = req.body.bus.toLowerCase(); // Turns out Firebase is case-sensitive, so format it how we like it!
         var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
 
-        const schoolArraysRef = ref.child('aquinas/' + req.body.date + '/' + busFormatted + '/' + journeyFormatted); // Extend on the reference to get the location that data will be stored
+        const schoolArraysRef = ref.child(config.school + '/' + req.body.date + '/' + busFormatted + '/' + journeyFormatted); // Extend on the reference to get the location that data will be stored
         schoolArraysRef.once("value", function (data) { // Read data from the reference above
 
           try {
@@ -126,11 +131,11 @@ app.post('/api/v1/check-in', (req, res) => { // Endpoint to log a check-in
           });
         });
 
-        res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=success'); // If we get to here, everything worked nicely! Return the user back from the API endpoint to the check-in page with a success message.
+        res.redirect('/check-in/' + config.school + '/' + req.body.bus + '?signed-in=success'); // If we get to here, everything worked nicely! Return the user back from the API endpoint to the check-in page with a success message.
       }
     }).catch((error) => {
       console.log('reCAPTCHA - HTTP POST Error: ' + error)
-      res.redirect('/check-in/aquinas/' + req.body.bus + '?signed-in=error&error=' + error);
+      res.redirect('/check-in/' + config.school + '/' + req.body.bus + '?signed-in=error&error=' + error);
     })
   }
 });
@@ -146,7 +151,7 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
         // They're genuine, let them through the floodgates.
 
         const db = admin.database(); // Define the database
-        const requestedRef = db.ref(`/users/aquinas/` + decodedToken.uid + `/name`); // Database reference
+        const requestedRef = db.ref(`/users/` + config.school + `/` + decodedToken.uid + `/name`); // Database reference
 
         requestedRef.once('value', (snapshot) => { // Grab the data from the reference above
           var requestedByVar = snapshot.val();
@@ -167,7 +172,7 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
           var journeyFormatted = req.body.journey.toUpperCase(); // Same as above, but time is upper instead of lowercase!
           const ref = db.ref('/check-in'); // Database reference
 
-          const schoolRef = ref.child('aquinas/' + dateString + '/' + busFormatted + '/' + journeyFormatted); // Expand on the database reference to the location we want to read data from
+          const schoolRef = ref.child(config.school + '/' + dateString + '/' + busFormatted + '/' + journeyFormatted); // Expand on the database reference to the location we want to read data from
 
           schoolRef.once('value', (data) => { // Read the data
             try { // Try this
@@ -321,7 +326,7 @@ function connectionStatus() { // Connection status thingy because I like being t
 
 function isSus(uid) {
   const db = admin.database(); // Define the database
-  const ref = db.ref('/users/aquinas/' + uid + '/name'); // Database reference
+  const ref = db.ref('/users/' + config.school + '/' + uid + '/name'); // Database reference
 
   ref.once('value', (snapshot) => { // Grab the data from the reference above
     if (snapshot.val() != null) { // If the user's name exists (meaning if there's actually a user properly registered with this idea)
@@ -336,7 +341,7 @@ function recaptchaResponse(req, res, next) {
   const captchaURL = `https://www.google.com/recaptcha/api/siteverify`
   // Get the token from the form
   const key = req.body['recaptchaResponse'];
-  const secret = '6LdgE3gcAAAAAPtTuas3jdIKxlbl1YBNtIQ5ehVs';
+  const secret = config.recpatchaSecret;
 
   axios({
     url: captchaURL,

@@ -12,7 +12,7 @@ h5 {
     padding-left: 15px;
     padding-right: 15px;
 }
-
+/*
 .checkin-container {
     width: 90%;
     height: 50%;
@@ -22,8 +22,9 @@ h5 {
     margin-top: 20px;
     border-radius: 10px;
     padding: 10px;
-}
+}*/
 
+/*
 .privacy-container {
     width: 90%;
     height: 50%;
@@ -35,6 +36,7 @@ h5 {
     padding: 30px;
     text-align: left;
 }
+*/
 
 .checkin-container h3 {
     margin-bottom: 25px;
@@ -45,12 +47,14 @@ h5 {
     margin-left: 15%;
 }
 
+/*
 .btn-primary {
     background-color: #FFFFFF !important;
     color: #005A4E !important;
     border-color: #FFFFFF !important;
     margin-top: 10px;
 }
+*/
 
 .bus-info {
     padding-left: 20px;
@@ -58,18 +62,22 @@ h5 {
     padding-top: 10px;
 }
 
+/*
 .swal2-styled.swal2-confirm {
     background-color: #005A4E !important;
 }
+*/
 
+/*
 .back, .back:hover {
     color: #FFFFFF;
 }
-
+*/
 .center {
     text-align: center;
 }
 
+/*
 .table-dark {
     --bs-table-bg: #005A4E !important;
     --bs-table-striped-bg: #FFFFFF !important;
@@ -81,3 +89,4 @@ h5 {
     color: #FFFFFF !important;
     border-color: #005A4E !important;
 }
+*/
