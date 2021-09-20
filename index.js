@@ -45,7 +45,14 @@ app.use('/static', express.static('static'))
 
 app.get('/', (req, res) => { // Splash page at /
   res.render('splash', {
-    body: 'You\'ve reached Leopard, a simple contact tracing system for school buses.<br><b>Please scan a Leopard QR code to check-in.</b><br>A project by <a href="https://www.noahball.com">Noah Ball</a>.'
+    error: false,
+    schoolName: config.school,
+    schoolFullName: config.schoolFull,
+    schoolLogo: config.schoolLogo,
+    schoolColour: config.schoolColour,
+    schoolTextColour: config.schoolTextColour,
+    recaptchaSite: config.recaptchaSite,
+    body: 'You\'ve reached Leopard, a simple contact tracing system for school buses.<br><b>Please scan a Leopard QR code to check-in.</b>'
   });
 });
 
@@ -76,6 +83,13 @@ app.get('/check-in/:school/:bus', (req, res) => { // Check-in page
     });
   } else { // If the school in the URL is not the school that Leopard is being used at
     res.render('splash', { // Render the splash screen...
+      error: true,
+      schoolName: config.school,
+      schoolFullName: config.schoolFull,
+      schoolLogo: config.schoolLogo,
+      schoolColour: config.schoolColour,
+      schoolTextColour: config.schoolTextColour,
+      recaptchaSite: config.recaptchaSite,
       body: req.params.school + ' does not use this Leopard instance.' // ...but set the text differently
     });
   }
@@ -211,6 +225,13 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
                 // Trying to narrow down the error here. Don't want to return a 'no results' message if a different error was encountered. A null value always crashes node... so I can't just simply check for it :/
                 var studentsArray = data.val().students;
                 res.render('splash', { // Render the splash screen...
+                  error: true,
+                  schoolName: config.school,
+                  schoolFullName: config.schoolFull,
+                  schoolLogo: config.schoolLogo,
+                  schoolColour: config.schoolColour,
+                  schoolTextColour: config.schoolTextColour,
+                  recaptchaSite: config.recaptchaSite,
                   body: 'Something went wrong. Debug information for nerds:<br>' + err // ...but set the text differently
                 }); // This response will only run if there's an error with running the line before, meaning that the students value was successfully recieved from Firebase, but something else is amiss.
                 console.log('An unexpected error was encountered: ' + err); // Log it, because something really went to custard!
@@ -228,6 +249,13 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
             }
           }, (errorObject) => { // Error encountered related to Firebase
             res.render('splash', { // Render the splash screen...
+              error: true,
+              schoolName: config.school,
+              schoolFullName: config.schoolFull,
+              schoolLogo: config.schoolLogo,
+              schoolColour: config.schoolColour,
+              schoolTextColour: config.schoolTextColour,
+              recaptchaSite: config.recaptchaSite,
               body: 'Something went wrong. Debug information for nerds:<br>' + errorObject.name // ...but set the text differently
             }); // Tell the user the nerdy debug info so I look cool (yikes!)
             console.log('An unexpected error was encountered: ' + errorObject.name); // Log it, because something really went to custard!
@@ -238,6 +266,13 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
 
             // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
             res.render('splash', {
+              error: true,
+              schoolName: config.school,
+              schoolFullName: config.schoolFull,
+              schoolLogo: config.schoolLogo,
+              schoolColour: config.schoolColour,
+              schoolTextColour: config.schoolTextColour,
+              recaptchaSite: config.recaptchaSite,
               body: 'Something went wrong. Debug information for nerds:<br>' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
             });
           } else {
@@ -252,6 +287,13 @@ app.post('/api/v1/lookup', (req, res) => { // Lookup endpoint (for grabbing list
 
           // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
           res.render('splash', {
+            error: true,
+            schoolName: config.school,
+            schoolFullName: config.schoolFull,
+            schoolLogo: config.schoolLogo,
+            schoolColour: config.schoolColour,
+            schoolTextColour: config.schoolTextColour,
+            recaptchaSite: config.recaptchaSite,
             body: 'Something went wrong. Debug information for nerds:<br>' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
           });
         } else {
@@ -303,6 +345,13 @@ app.get('/admin', (req, res) => { // /admin page
 
         // Definitely a fake ID token! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! IMPOSTOR! 
         res.render('splash', {
+          error: true,
+          schoolName: config.school,
+          schoolFullName: config.schoolFull,
+          schoolLogo: config.schoolLogo,
+          schoolColour: config.schoolColour,
+          schoolTextColour: config.schoolTextColour,
+          recaptchaSite: config.recaptchaSite,
           body: 'Something went wrong. Debug information for nerds:<br>' + error + '<br>Please try signing in again <a href="/login">here</a>.' // Tell the sussy baka an error in case my code funked up
         });
       } else {

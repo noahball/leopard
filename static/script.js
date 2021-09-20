@@ -56,7 +56,7 @@ var styles = `
   background-color: ` + schoolColour + `;
   color: ` + schoolTextColour + `;
   margin: 0 auto;
-  margin-top: 40px;
+  margin-top: 20px;
   border-radius: 10px;
   padding: 30px;
   text-align: left;
