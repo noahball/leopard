@@ -6,6 +6,8 @@ let ejs = require('ejs'); // Import EJS (dynamic page generator)
 var bodyParser = require('body-parser'); // Parser
 const cookieParser = require("cookie-parser"); // Parser
 const axios = require('axios'); // Outgoing HTTP requests
+const art = require('ascii-art'); // ASCII Art
+const Font = require('ascii-art-font'); // ASCII Art Fonts
 const app = express() // Define Express
 const port = 3000 // Port for Leopard's web server to run on
 
@@ -400,7 +402,29 @@ function connectionStatus() { // Connection status thingy because I like being t
   ref.once('value', (snapshot) => { // Grab the data from the reference above
     if (snapshot.val() == 'online') {
       console.log('Connected to Firebase RTDB.') // Boring
+      // Leopard ASCII
+
+      Font.fontPath = 'fonts/';
+
+      Font.create("Leopard", 'speed', (err, rendered) => {
+        if (!err) {
+          console.log(rendered)
+        } else if (err) {
+          console.log(err)
+        }
+      });
     } else {
+      // Leopard ASCII
+
+      Font.fontPath = 'fonts/';
+
+      Font.create("Leopard", 'speed', (err, rendered) => {
+        if (!err) {
+          console.log(rendered);
+        } else if (err) {
+          console.log(err)
+        }
+      });
       console.log('Connected to Firebase RTDB with message: "' + snapshot.val() + '"') // IDK why this is here - maybe if I wanted to throw a fun message or something lol
     }
   }, (errorObject) => {
